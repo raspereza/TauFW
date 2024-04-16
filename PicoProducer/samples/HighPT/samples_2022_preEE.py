@@ -123,8 +123,11 @@ samples  = [
       "/Muon/Run2022E-ReRecoNanoAODv11-v1/NANOAOD",
       store=storage,url=url,files=filelist,opts="useT1=False",channels=["skim*",'mutau','mumu','emu','highpt', 'munu', 'wjets']),
  
-  
     # MET
+    D('JetHT_Run2022C','JetHT_Run2022C',"/JetHT/Run2022C-ReRecoNanoAODv11-v1/NANOAOD",
+      store=storage,url=url,files=filelist,opts="useT1=False",channels=["skim*",'munu', 'taunu', 'dijets']),
+    D('MET_Run2022C','MET_Run2022C',"/MET/Run2022C-ReRecoNanoAODv11-v1/NANOAOD",
+      store=storage,url=url,files=filelist,opts="useT1=False",channels=["skim*",'munu', 'taunu', 'dijets']),
     D('JetMet_Run2022C','JetMet_Run2022C',"/JetMET/Run2022C-ReRecoNanoAODv11-v1/NANOAOD",
       store=storage,url=url,files=filelist,opts="useT1=False",channels=["skim*",'munu', 'taunu', 'dijets']),
     D('JetMet_Run2022D','JetMet_Run2022D',"/JetMET/Run2022D-ReRecoNanoAODv11-v1/NANOAOD",
