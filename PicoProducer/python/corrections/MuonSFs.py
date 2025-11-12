@@ -62,12 +62,13 @@ class MuonSFs:
         sf_trig_ = "NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight"
         fname_id = pathPOG+"2016postVFP_UL/muon_Z.json.gz"
       elif '2017' in era:
-        fname_id = pathPOG+"2018_UL/muon_Z.json.gz"
-        if 'HLT_IsoMu27' in flags: # use only HLT_IsoMu27
-          sf_trig_ = "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight"
-        else: # default: use (HLT_IsoMu24 || HLT_IsoMu27)
-          sf_trig_ = "mu_trig"
-          fname_trig = pathHTT+"Run2017/Muon_IsoMu24orIsoMu27.root"
+        fname_id = pathPOG+"2017_UL/muon_Z.json.gz"
+        sf_trig_ = "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight"
+#        if 'HLT_IsoMu27' in flags: # use only HLT_IsoMu27
+#          sf_trig_ = "NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight"
+#        else: # default: use (HLT_IsoMu24 || HLT_IsoMu27)
+#          sf_trig_ = "mu_trig"
+#          fname_trig = pathHTT+"Run2017/Muon_IsoMu24orIsoMu27.root"
       elif '2018' in era:
         fname_id = pathPOG+"2018_UL/muon_Z.json.gz"
     else: # Run-3
