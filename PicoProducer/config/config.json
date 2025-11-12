@@ -20,7 +20,7 @@
     },
     "jobdir": "output/$ERA/$CHANNEL/$SAMPLE",
     "outdir": "/eos/cms/store/group/phys_tau/rasp/Run2_UL/output/$ERA/$CHANNEL/$SAMPLE",
-    "nanodir": "/eos/cms/store/group/phys_tau/rasp/Run2_UL/nano/$ERA/$DAS",
+    "nanodir": "/eos/cms/store/group/phys_tau/TauFW/nanoV10/Run2_2017/$DAS",
     "picodir": "/eos/cms/store/group/phys_tau/rasp/Run2_UL/$ERA/$CHANNEL/$GROUP",
     "tmpskimdir": "",
     "batch": "HTCondor",
