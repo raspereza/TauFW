@@ -14,27 +14,28 @@ import os
 #     definition of cuts        #
 #################################
 
-XTitle = {
-    'pt_1'  : "muon p_{T} (GeV)",
-    'eta_1' : "muon #eta",
-    'pt_2'  : "tau p_{T} (GeV)",
-    'eta_2' : "tau #eta",
-    'm_vis' : "m_{vis} (GeV)",
-    'met'   : "E_{T}^{mis} (GeV)",
-    'dm_2'  : "decay mode",
-    'mt_1'  : "m_{T}(#mu,MET) (GeV)",
-    'rawDeepTau2018v2p5VSmu_2' : 'D_{#mu}'
+Vars = {
+#    VAR        TITLE                          BINNING       Legend   Logy   
+    'pt_1'  : ("muon p_{T} (GeV)",           20,  25., 125.,  True,  False),
+    'eta_1' : ("muon #eta",                  24, -2.4,  2.4, False,  False),
+    'pt_2'  : ("tau p_{T} (GeV)",            20,  20., 120.,  True,  False),
+    'eta_2' : ("tau #eta",                   25, -2.5,  2.5, False,  False),
+    'm_vis' : ("m_{vis} (GeV)",              32,   0., 160.,  True,  False), 
+    'met'   : ("E_{T}^{mis} (GeV)",          20,   0., 200.,  True,  False),
+    'dm_2'  : ("decay mode",                 12, -0.5, 11.5,  True,  False),
+    'mt_1'  : ("m_{T}(#mu,MET) (GeV)",        8,   0.,  40.,  True,  False),
+    'rawDeepTau2018v2p5VSmu_2' : ('D_{#mu}', 10,   0.,   1.,  True,  True),
 }
 
-def ExtractHistos(f,var,bins):
+def ExtractHistos(f,var,dm,bins):
     hists = {}
     
-    hists['Data_os'] = utils.rebinHisto(f.Get(f'Data_{var}_os'),bins,'rebinned')
-    hists['Data_ss'] = utils.rebinHisto(f.Get(f'Data_{var}_ss'),bins,'rebinned')
+    hists['Data_os'] = utils.rebinHisto(f.Get(f'Data_{var}_os_{dm}'),bins,'rebinned')
+    hists['Data_ss'] = utils.rebinHisto(f.Get(f'Data_{var}_ss_{dm}'),bins,'rebinned')
     for s in utils.procs:
         for sign in ['os','ss']:
             name_reduced = f'{s}_{sign}'
-            name = f'{s}_{var}_{sign}'
+            name = f'{s}_{var}_{sign}_{dm}'
             hists[name_reduced] = utils.rebinHisto(f.Get(name),bins,'rebinned')
     return hists
 
@@ -48,24 +49,24 @@ def PlotZtoMuTau(hists,**kwargs):
     wpVsE = kwargs.get('wpVsE','VVLoose')
     plotLegend = kwargs.get('plotLegend',True)
     setLogy = kwargs.get('setLogy',False)
-    prong = kwargs.get('prong',0)
+    dm = kwargs.get('dm','1prong')
     applySF = kwargs.get('applySF',False)
     
-    h_data = hists['Data_os']
+    h_data = hists['Data_os'].Clone('h_data')
     
-    h_ewk = hists['VV_os']
+    h_ewk = hists['VV_os'].Clone('h_ewk')
     
-    h_tt = hists['TTT_os']
+    h_tt = hists['TTT_os'].Clone('h_tt')
     h_tt.Add(h_tt,hists['TTL_os'],1.,1.)
 
-    h_zll = hists['ZL_os']
-    h_ztt = hists['ZTT_os']
+    h_zll = hists['ZL_os'].Clone('h_zll')
+    h_ztt = hists['ZTT_os'].Clone('h_ztt')
 
-    h_fakes = hists['W_os']
+    h_fakes = hists['W_os'].Clone('h_fakes')
     h_fakes.Add(h_fakes,hists['ZJ_os'],1.,1.)
     h_fakes.Add(h_fakes,hists['TTJ_os'],1.,1.)
     
-    h_qcd = hists['Data_ss']
+    h_qcd = hists['Data_ss'].Clone('h_qcd')
     for s in utils.procs:
         h_qcd.Add(h_qcd,hists[f'{s}_ss'],1.,-1.) 
 
@@ -96,7 +97,8 @@ def PlotZtoMuTau(hists,**kwargs):
     print('Fakes: %7.0f'%(x_fakes))
     print('Tot  : %7.0f'%(x_tot))
     print('Data : %7.0f'%(x_data))
-    
+
+
     h_ewk.Add(h_ewk,h_tt,1.,1.)
     h_fakes.Add(h_fakes,h_ewk,1.,1.)
     h_qcd.Add(h_qcd,h_fakes,1.,1.)
@@ -105,37 +107,42 @@ def PlotZtoMuTau(hists,**kwargs):
     
     h_tot = h_zll.Clone("total")
     styles.InitTotalHist(h_tot)
-    
+
+
+    # applying ad-hoc uncertainties
     # 20% -> jet->tau fake rate
     # 10% -> tauID
-    # 50% -> mu->tau fake rate
-
-    sf_jfake = 0.25
+    # 70% -> mu->tau fake rate
+    
+    sf_jfake = 0.20
     sf_tauID = 0.10
     sf_lfake = 0.70
-    sf_qcd = 0.25
+    sf_qcd = 0.15
     if applySF:
         sf_jfake = 0.10
         sf_tauID = 0.05
-        sf_lfake = 0.17
-        sf_qcd = 0.20
+        sf_lfake = 0.20
+        sf_qcd = 0.10
     
-#    nbins = h_data.GetNbinsX()        
-#    for ib in range(1,nbins+1):
-#        e_jfake = sf_jfake*h_fakes.GetBinContent(ib)
-#        e_lfake = sf_lfake*zll.GetBinContent(ib)
-#        e_tauID = sf_tauID*z_tt.GetBinContent(ib)
-#        e_QCD = sf_qcd*.GetBinContent(ib)
-#        e_tot = h_tot.GetBinError(ib)
-#        e = math.sqrt(e_jfake*e_jfake+e_lfake*e_lfake+e_tauID*e_tauID+e_QCD*e_QCD+e_tot*e_tot)
-#        h_tot.SetBinError(ib,0.)
+    nbins = h_data.GetNbinsX()        
+    for ib in range(1,nbins+1):
+        e_jfake = sf_jfake*h_fakes.GetBinContent(ib)
+        e_lfake = sf_lfake*(hists['ZL_os'].GetBinContent(ib)+hists['TTL_os'].GetBinContent(ib))
+        e_tauID = sf_tauID*(hists['ZTT_os'].GetBinContent(ib)+hists['TTT_os'].GetBinContent(ib))
+        e_QCD = sf_qcd*h_qcd.GetBinContent(ib)
+        e_tot = h_tot.GetBinError(ib)
+        err = math.sqrt(e_jfake*e_jfake+e_lfake*e_lfake+e_tauID*e_tauID+e_QCD*e_QCD+e_tot*e_tot)
+        h_tot.SetBinError(ib,err)
 
     
     h_ratio = utils.histoRatio(h_data,h_tot,'ratio')
     h_tot_ratio = utils.createUnitHisto(h_tot,'tot_ratio')
 
     styles.InitRatioHist(h_ratio)
-    h_ratio.GetYaxis().SetRangeUser(0.801,2.299)
+    if setLogy:
+        h_ratio.GetYaxis().SetRangeUser(0.801,2.299)
+    else:
+        h_ratio.GetYaxis().SetRangeUser(0.299,1.699)
     
     utils.zeroBinErrors(h_zll)
     utils.zeroBinErrors(h_ztt)
@@ -147,11 +154,14 @@ def PlotZtoMuTau(hists,**kwargs):
     if h_tot.GetMaximum()>ymax: ymax = h_tot.GetMaximum()
 
     h_data.GetYaxis().SetRangeUser(0.,1.2*ymax)
-    if setLogy: h_data.GetYaxis().SetRangeUser(10.,20.*ymax)
+    if setLogy:
+        h_data.GetYaxis().SetRangeUser(10.,20.*ymax)
+    else:
+        h_data.GetYaxis().SetRangeUser(0.,1.2*ymax)
     h_data.GetXaxis().SetLabelSize(0)
     h_data.GetYaxis().SetTitle("Events")
     h_ratio.GetYaxis().SetTitle("obs/exp")
-    h_ratio.GetXaxis().SetTitle(XTitle[var])
+    h_ratio.GetXaxis().SetTitle(Vars[var][0])
 
     # canvas and pads
     canvas = styles.MakeCanvas("canv","",600,700)
@@ -165,21 +175,21 @@ def PlotZtoMuTau(hists,**kwargs):
     h_zll.Draw('hsame')
     h_ztt.Draw('hsame')
     h_qcd.Draw('hsame')
-    h_fakes.Draw('hsame')
+#    h_fakes.Draw('hsame')
     h_ewk.Draw('hsame')
     h_tt.Draw('hsame')
     h_data.Draw('e1same')
     h_tot.Draw('e2same')
 
-    leg = ROOT.TLegend(0.65,0.4,0.9,0.75)
+    leg = ROOT.TLegend(0.7,0.5,0.9,0.75)
     styles.SetLegendStyle(leg)
     leg.SetTextSize(0.043)
     leg.AddEntry(h_data,'data','lp')
     leg.AddEntry(h_zll,'Z#rightarrow#mu#mu','f')
     leg.AddEntry(h_ztt,'Z#rightarrow#tau#tau','f')
-    leg.AddEntry(h_qcd,'QCD','f')
-    leg.AddEntry(h_fakes,'non-QCD j#rightarrow#tau','f')
-    leg.AddEntry(h_ewk,'electroweak','f')
+    leg.AddEntry(h_qcd,'jet#rightarrow#tau fakes','f')
+#    leg.AddEntry(h_fakes,'non-QCD j#rightarrow#tau','f')
+    leg.AddEntry(h_ewk,'EW','f')
     leg.AddEntry(h_tt,'t#bar{t}','f')
     if plotLegend: leg.Draw()
 
@@ -220,11 +230,11 @@ def PlotZtoMuTau(hists,**kwargs):
     print('')
     print('Creating control plot')
 
-    suffix = utils.defineSuffix(chan,era,wpVsJet,wpVsMu,wpVsE,prong,applySF)
+    suffix = utils.defineSuffix(chan,era,wpVsJet,wpVsMu,wpVsE,applySF)
     
     subfolder = ensuredir('%s/ControlPlots'%(utils.figuresFolder))
     outputfolder = ensuredir('%s/%s'%(subfolder,suffix))
-    canvas.Print(outputfolder+"/"+var+".png")
+    canvas.Print(outputfolder+"/"+var+"_"+dm+".png")
     
 ############
 #   MAIN   #
@@ -239,41 +249,29 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024'])
     parser.add_argument('-c', '--channel', dest='channel', default='mutau')
-    parser.add_argument('-var', '--var', dest='var', default='m_vis', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSmu_2'])
+    parser.add_argument('-var', '--var', dest='var', default=['m_vis','pt_1','pt_2','eta_1','eta_2','met','rawDeepTau2018v2p5VSmu_2'], nargs='+', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSmu_2'])
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Medium','Tight','VTight'])
-    parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Tight'])
-    parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Tight'])
-    parser.add_argument('-prong','--prong', dest='prong',type=int,default=1,choices=[0,1,3])
-    parser.add_argument('-nbins','--nbins', dest='nbins',type=int,default=10)
-    parser.add_argument('-xmin','--xmin', dest='xmin',type=float,default=40)
-    parser.add_argument('-xmax','--xmax', dest='xmax',type=float,default=140)
+    parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='Tight', choices=['VLoose','Loose','Medium','Tight'])
+    parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Medium','Tight'])
+    parser.add_argument('-dm','--dm', dest='dm',default='1prong',choices=['1prong','DM0','DM1','3prong'])
     parser.add_argument('-applySF','--applySF',dest='applySF',action='store_true')
     
     args = parser.parse_args()
     
-    var = args.var
+    variables = args.var
     era = args.era
     chan = args.channel
     wpVsJet = args.wpVsJet
     wpVsMu = args.wpVsMu
     wpVsE = args.wpVsE
-    prong = args.prong
+    dm = args.dm
     applySF = args.applySF
-    nbins = args.nbins
-    xmin = args.xmin
-    xmax = args.xmax
+#    nbins = args.nbins
+#    xmin = args.xmin
+#    xmax = args.xmax
 
-    bins = utils.createBins(nbins,xmin,xmax)
 
-    plotLegend = True
-    if var in ['eta_1','eta_2','rawDeepTau2018v2p5VSmu_2']:
-        plotLegend = False
-
-    setLogy = False
-    if var=='rawDeepTau2018v2p5VSmu_2':
-        setLogy = True
-    
-    suffix = utils.defineSuffix(chan,era,wpVsJet,wpVsMu,wpVsE,prong,applySF)
+    suffix = utils.defineSuffix(chan,era,wpVsJet,wpVsMu,wpVsE,applySF)
     inputfolder = '%s/%s'%(utils.outputFolder,suffix)
     inputfileName = '%s/mutau.root'%(inputfolder)
     if os.path.isfile(inputfileName):
@@ -285,16 +283,24 @@ if __name__ == "__main__":
         print('quit')
         exit()
     inputfile = ROOT.TFile(inputfileName,'read')
-    hists = ExtractHistos(inputfile,var,bins)
-    
-    PlotZtoMuTau(hists,
-                 era=era,
-                 chan=chan,
-                 var=var,
-                 wpVsJet=wpVsJet,
-                 wpVsE=wpVsE,
-                 wpVsMu=wpVsMu,
-                 applySF=applySF,
-                 prong=prong,
-                 plotLegend=plotLegend,
-                 setLogy=setLogy)
+
+    for var in variables:
+        nbins = Vars[var][1]
+        xmin  = Vars[var][2]
+        xmax  = Vars[var][3]
+        plotLegend = Vars[var][4]
+        setLogy = Vars[var][5]
+        bins  = utils.createBins(nbins,xmin,xmax)
+        hists = ExtractHistos(inputfile,var,dm,bins)
+        
+        PlotZtoMuTau(hists,
+                     era=era,
+                     chan=chan,
+                     var=var,
+                     wpVsJet=wpVsJet,
+                     wpVsE=wpVsE,
+                     wpVsMu=wpVsMu,
+                     applySF=applySF,
+                     dm=dm,
+                     plotLegend=plotLegend,
+                     setLogy=setLogy)

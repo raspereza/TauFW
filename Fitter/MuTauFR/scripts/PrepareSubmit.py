@@ -7,24 +7,19 @@ import TauFW.Fitter.MuTauFR.analysisMuTauFR as analysis
 import os
 
 def SubmitJob(**kwargs):
-
     era = kwargs.get('era','2024')
     chan = kwargs.get('channel','mutau')
     sample = kwargs.get('sample','Muon0_2024B')
     start = kwargs.get('start',0)
     period = kwargs.get('period',10000000)
-    prong = kwargs.get('prong',1)
     wpVsMu = kwargs.get('wpVsMu','VLoose')
     wpVsE = kwargs.get('wpVsE','VVLoose')
     wpVsJet = kwargs.get('wpVsJet','Medium')
     applySF = kwargs.get('applySF',False)
-
+    condor_folder = kwargs.get('condor_folder',utils.condorFolder)
+    
     # executable
     cmssw_base = os.getenv('CMSSW_BASE')
-    
-    suffix = utils.defineSuffix(chan,era,wpVsJet,wpVsMu,wpVsMu,prong,applySF)
-    foldername = utils.condorFolder + '/' + suffix
-    condor_folder = ensuredir(foldername)
     basefilename = f'{sample}_{start}'
     filename_exec = f'{condor_folder}/{basefilename}.sh'
     f = open(filename_exec,'w')
@@ -35,7 +30,11 @@ def SubmitJob(**kwargs):
     f.write('cmsenv\n')
     f.write('cd TauFW/Fitter/MuTauFR\n')
     f.write('echo $PWD\n')
-    commandline = f'./scripts/RunSelectionMuTau.py --era {era} --channel {chan} --sample {sample} --start {start} --period {period} --wpVsJet {wpVsJet} --wpVsMu {wpVsMu} --wpVsE {wpVsE} --prong {prong}\n'
+    commandline = f'./scripts/RunSelectionMuTau.py --era {era} --channel {chan} --sample {sample} --start {start} --period {period} --wpVsJet {wpVsJet} --wpVsMu {wpVsMu} --wpVsE {wpVsE}'
+    if applySF:
+        commandline += ' --applySF\n'
+    else:
+        commandline += '\n'
     f.write(commandline)
     os.system(f'chmod u+x {filename_exec}')
     
@@ -72,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
-    parser.add_argument('-prong','--prong', dest='prong',type=int,default=1,choices=[0,1,3])
+    parser.add_argument('-applySF','--applySF', dest='applySF',action='store_true')
     parser.add_argument('-period','--period',dest='period',type=int,default=10000000)
     args = parser.parse_args()
 
@@ -81,10 +80,16 @@ if __name__ == "__main__":
     wpVsJet = args.wpVsJet
     wpVsMu = args.wpVsMu
     wpVsE = args.wpVsE
-    prong = args.prong
     period = args.period
-
-    submitfile = 'submit.bash'
+    applySF = args.applySF
+    
+    suffix = utils.defineSuffix(channel,era,wpVsJet,wpVsMu,wpVsE,applySF)
+    foldername = utils.condorFolder + '/' + suffix
+    condor_folder = ensuredir(foldername)
+    command = f'rm {condor_folder}/*'
+    os.system(command)
+    
+    submitfile = f'{condor_folder}/submit.bash'
     f = open(submitfile,'w')
     f.write('#!/bin/bash\n')
     
@@ -95,14 +100,15 @@ if __name__ == "__main__":
         print(f'{sample}  entries={nentries}  nperiods={nperiods}')
         for iperiod in range(0,nperiods+1):
             command = SubmitJob(era=era,
+                                condor_folder=condor_folder,
                                 channel=channel,
                                 sample=sample,
                                 wpVsJet=wpVsJet,
                                 wpVsMu=wpVsMu,
                                 wpVsE=wpVsE,
-                                prong=prong,
                                 start=iperiod,
-                                period=period)
+                                period=period,
+                                applySF=applySF)
             f.write(command+'\n')
         
     for sample in utils.mc_samples[era]:
@@ -113,12 +119,22 @@ if __name__ == "__main__":
         for iperiod in range(0,nperiods+1):
             command = SubmitJob(era=era,
                                 channel=channel,
+                                condor_folder=condor_folder,
                                 sample=sample,
                                 wpVsJet=wpVsJet,
                                 wpVsMu=wpVsMu,
                                 wpVsE=wpVsE,
-                                prong=prong,
                                 start=iperiod,
-                                period=period)
+                                period=period,
+                                applySF=applySF)
             f.write(command+'\n')
-    os.system('chmod u+x submit.bash')
+    outputFolder = utils.outputFolder+'/'+suffix
+    if os.path.isdir(outputFolder):
+        f.write(f'rm {outputFolder}/*.root\n')
+    command = f'chmod u+x {submitfile}'
+    os.system(command)
+    print(f'Submit jobs by executing file {submitfile}')
+    if os.path.isdir(outputFolder):
+        print('ATTENTION! CONTENT OF FOLDER')
+        print(f'{outputFolder}')
+        print('WILL BE ERASED!')

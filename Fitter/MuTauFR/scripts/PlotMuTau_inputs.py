@@ -33,11 +33,10 @@ def copyHisto(histo1,histo2):
             histo2.SetBinContent(ib,x)
             histo2.SetBinError(ib,e)
 
-
 regions = ['pass','fail']
 samples = ['data_obs','ZTT','ZJ','ZL','TTT','TTL','TTJ','VV','W','QCD']
 mc_samples = ['ZTT','ZJ','ZL','TTT','TTL','TTJ','VV','W','QCD']
-options = ['shapes_prefit','shapes_fit_s'] 
+
 
 #################################
 ###### plotting subroutine ######
@@ -50,19 +49,10 @@ def Plot(hists,**kwargs):
     wpVsMu = kwargs.get('wpVsMu','VLoose')
     wpVsEle = kwargs.get('wpVsEle','Tight')
     plotLegend = kwargs.get('plotLegend',True)
-    option = kwargs.get('option','shapes_fit_s')
     region = kwargs.get('region','pass')
     dm = kwargs.get('dm','1prong')
 
-    FIT = 'prefit'
-    if option=='shapes_fit_s': FIT = 'postfit'
-    
-    
-    postFit = True
-    if option=='shapes_prefit': postFit = False
-    
-    preFit = not postFit
-
+    FIT = 'input'
     h_data = hists['data_obs']
 
     h_zll = hists['ZL']
@@ -87,8 +77,6 @@ def Plot(hists,**kwargs):
     styles.InitHist(h_qcd,   "","",ROOT.TColor.GetColor("#FFCCFF"),1001)
     styles.InitHist(h_jfakes,"","",ROOT.kGreen+6,1001)
     
-    h_tot = hists['total']
-    styles.InitTotalHist(h_tot)
     
     x_zll = h_zll.GetSumOfWeights()
     x_ztt = h_ztt.GetSumOfWeights()
@@ -98,7 +86,6 @@ def Plot(hists,**kwargs):
     x_jfakes = h_jfakes.GetSumOfWeights()
     x_data = h_data.GetSumOfWeights()
     x_tot = x_zll+x_ztt+x_qcd+x_ewk+x_tt+x_jfakes
-    x_checksum = h_tot.GetSumOfWeights()
     
     print('ZTT   : %7.0f'%(x_ztt))
     print('ZL    : %7.0f'%(x_zll))
@@ -107,7 +94,6 @@ def Plot(hists,**kwargs):
     print('EWK   : %7.0f'%(x_ewk))
     print('TT    : %7.0f'%(x_tt))
     print('Total : %7.0f'%(x_tot))
-#    print('Check : %7.0f'%(x_checksum))
     print('Data  : %7.0f'%(x_data))
     
     h_ewk.Add(h_ewk,h_tt,1.,1.)
@@ -115,6 +101,9 @@ def Plot(hists,**kwargs):
     h_qcd.Add(h_qcd,h_jfakes,1.,1.)
     h_ztt.Add(h_ztt,h_qcd,1.,1.)
     h_zll.Add(h_zll,h_ztt,1.,1.)
+
+    h_tot =  h_zll.Clone('h_tot')
+    styles.InitTotalHist(h_tot)
 
     h_ratio = utils.histoRatio(h_data,h_tot,'ratio')
     h_tot_ratio = utils.createUnitHisto(h_tot,'tot_ratio')
@@ -160,20 +149,19 @@ def Plot(hists,**kwargs):
 
     leg = None
     if region=='pass':
-        leg = ROOT.TLegend(0.65,0.40,0.85,0.75)
+        leg = ROOT.TLegend(0.65,0.34,0.90,0.75)
     else:
         leg = ROOT.TLegend(0.25,0.57,0.5,0.78)
     styles.SetLegendStyle(leg)
-    leg.SetTextSize(0.043)
-    leg.SetHeader(utils.etaTitle[etabin])
+    leg.SetTextSize(0.042)
+#    leg.SetHeader(etabins[etabin])
     leg.AddEntry(h_data,'data','lp')
     leg.AddEntry(h_zll,'Z#rightarrow#mu#mu','f')
     if region=='pass':
         leg.AddEntry(h_ztt,'Z#rightarrow#tau#tau','f')
-        leg.AddEntry(h_qcd,'#j#rightarrow#tau','f')
-#        leg.AddEntry(h_jfakes,'non-QCD j#rightarrow#tau','f')
-        leg.AddEntry(h_ewk,'other','f')
-#        leg.AddEntry(h_tt,'t#bar{t}','f')
+        leg.AddEntry(h_qcd,'#j#tau fakes','f')
+        leg.AddEntry(h_ewk,'electroweak','f')
+        leg.AddEntry(h_tt,'t#bar{t}','f')
     else:
         leg.AddEntry(h_ztt,'bkg','f')
         
@@ -240,7 +228,7 @@ if __name__ == "__main__":
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
-    parser.add_argument('-dm','--dm',dest='dm',default='1prong')
+    parser.add_argument('-dm','--dm', dest='dm', default='DM0', choices=['1prong','DM0','DM1'])
     args = parser.parse_args()
 
     era = args.era
@@ -255,51 +243,30 @@ if __name__ == "__main__":
         print('folder %s')
     else:
         print('folder %s does not exist'%(basedir))
-        print('You have to produced datacards for era=%s, WP: %sVsJet %sVsMu %sVsE and dm=%s'%(era,wp_vs_jet,wp_vs_mu,wp_vs_e,dm))
+        print('You have to produced datacards for era=%s %sVsJet %sVsMu %sVsE %s'%(era,wp_vs_jet,wp_vs_mu,wp_vs_e,dm))
+        
     for etabin in utils.etabins:
-        inputCardsFileName = '%s/%s.root'%(basedir,etabin)
+        inputCardsFileName = '%s/%s_inputs.root'%(basedir,etabin)
         if os.path.isfile(inputCardsFileName):
             print('datacards file %s'%(inputCardsFileName))
         else:
             print('file %s does not exist. quitting'%(inputCardsFileName))
             exit()
         inputCardsFile = ROOT.TFile(inputCardsFileName,'read')
-        inputFitFileName = '%s/%s_fit.root'%(basedir,etabin)
-        if os.path.isfile(inputFitFileName):
-            print('file with the fit results : %s '%(inputFitFileName))
-        else:
-            print('file with fit results %s does not exist. quitting'%(inputCardsFileName))
-            exit()
-        
-        inputFitFile = ROOT.TFile(inputFitFileName,'read')
-
-        for option in options:
-            for region in regions:
-                print('%s  %s  %s'%(etabin,option,region))
-                hists = {}
-                folder = '%s'%(region)
-                name = '%s_%s_%s'%(etabin,option,region)                
-                hist_ref = inputCardsFile.Get(folder+'/data_obs')
-                hists['data_obs'] = createEmptyHisto(hist_ref,'data_'+name)
-                copyHisto(hist_ref,hists['data_obs'])
-                folder_fit = '%s/%s'%(option,folder)
-                for sample in mc_samples:
-                    histname_input = folder+'/'+sample
-                    histname_input_fit = folder_fit+'/'+sample
-                    hists[sample] = inputCardsFile.Get(histname_input).Clone(sample+'_'+name)
-                    hist = inputFitFile.Get(folder_fit+'/'+sample)
-                    copyHisto(hist,hists[sample])
-                hists['total'] = createEmptyHisto(hist_ref,'total_'+name)
-                hist = inputFitFile.Get(folder_fit+'/total')
-                copyHisto(hist,hists['total'])
-                Plot(hists,
-                     era=era,
-                     etabin=etabin,
-                     wpVsJet=wp_vs_jet,
-                     wpVsEle=wp_vs_e,
-                     wpVsMu=wp_vs_mu,
-                     option=option,
-                     plotLegend=True,
-                     region=region)
+        for region in regions:
+            print('%s  %s'%(etabin,region))
+            hists = {}
+            folder = '%s'%(region)
+            for sample in samples:
+                hists[sample] = inputCardsFile.Get(folder+'/'+sample)
+            Plot(hists,
+                 era=era,
+                 etabin=etabin,
+                 wpVsJet=wp_vs_jet,
+                 wpVsEle=wp_vs_e,
+                 wpVsMu=wp_vs_mu,
+                 plotLegend=True,
+                 region=region,
+                 dm=dm)
 
 

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # Author: Alexei Raspereza (October 2025)
 # mu->tau FR SF measurement
-# Datacard producer 
+# Script to run mu+tau selection
 import ROOT
 import math
 from array import array
@@ -9,7 +9,7 @@ import os
 import TauFW.Fitter.MuTauFR.utils as utils
 import TauFW.Fitter.MuTauFR.styles as styles
 import TauFW.Fitter.MuTauFR.analysisMuTauFR as analysis
-import TauFW.Fitter.MuTauFR.TauScaleFactors as tauScaleFactor
+from TauFW.Fitter.MuTauFR.TauScaleFactors import TauScaleFactor
 from TauFW.Plotter.plot.utils import ensuredir
 
 ############
@@ -25,10 +25,9 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024'])
     parser.add_argument('-c','--channel',dest='channel',default='mutau',choices=['mutau','mumu'])
-    parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Medium','Tight','VTight'])
+    parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
-    parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Tight'])
-    parser.add_argument('-prong','--prong', dest='prong',type=int,default=1,choices=[0,1,3])
+    parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
     parser.add_argument('-sample','--sample',dest='sample',default='TTto2L2Nu')
     parser.add_argument('-applySF','--applySF',dest='applySF',action='store_true')
     parser.add_argument('-start','--start',dest='start',type=int,default=0)
@@ -44,25 +43,23 @@ if __name__ == "__main__":
     wpVsMu = args.wpVsMu
     wpVsE = args.wpVsE
 
-    prong=args.prong
     applySF = args.applySF
     sample = args.sample
 
     scaleFactor = None
+    if applySF:
+        cmssw_base = os.getenv('CMSSW_BASE')
+        filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors.root'%(cmssw_base,era)
+        scaleFactor = TauScaleFactor(filename=filename,wpVsJet=wpVsJet,wpVsMu=wpVsMu,wpVsE=wpVsE)
     
     sampleToProcess = analysis.sampleMuTauFR(era,channel,sample)
     sampleToProcess.SetMuTauConfig(scaleFactor,
                                    antiJet = utils.tauVsJetIntWPs[wpVsJet],
                                    antiMu = utils.tauVsMuIntWPs[wpVsMu],
-                                   antiE = utils.tauVsEleIntWPs[wpVsE],
-                                   prong=prong)    
+                                   antiE = utils.tauVsEleIntWPs[wpVsE])
     hists = sampleToProcess.CreateHistosMuTau(start,period)
 
     suffix = f'{wpVsJet}VsJet_{wpVsMu}VsMu_{wpVsE}VsE'
-    if prong==1:
-        suffix += '_1pr'
-    if prong==3:
-        suffix += '_3pr'
     if applySF:
         suffix += '_SF'
 
