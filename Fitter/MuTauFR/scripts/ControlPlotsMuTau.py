@@ -86,15 +86,16 @@ def PlotZtoMuTau(hists,**kwargs):
     x_fakes = h_fakes.GetSumOfWeights()
     x_data = h_data.GetSumOfWeights()
     x_tot = x_zll+x_ztt+x_qcd+x_ewk+x_tt+x_fakes
+
     
     print('')
     print('Yields ->')
     print('ZTT  : %7.0f'%(x_ztt))
-    print('ZL   : %7.0f'%(x_zll))
     print('TT   : %7.0f'%(x_tt))
     print('QCD  : %7.0f'%(x_qcd))
     print('EWK  : %7.0f'%(x_ewk))
     print('Fakes: %7.0f'%(x_fakes))
+    print('ZL   : %7.0f'%(x_zll))
     print('Tot  : %7.0f'%(x_tot))
     print('Data : %7.0f'%(x_data))
 
@@ -142,7 +143,7 @@ def PlotZtoMuTau(hists,**kwargs):
     if setLogy:
         h_ratio.GetYaxis().SetRangeUser(0.801,2.299)
     else:
-        h_ratio.GetYaxis().SetRangeUser(0.299,1.699)
+        h_ratio.GetYaxis().SetRangeUser(0.301,1.699)
     
     utils.zeroBinErrors(h_zll)
     utils.zeroBinErrors(h_ztt)
@@ -177,20 +178,21 @@ def PlotZtoMuTau(hists,**kwargs):
     h_qcd.Draw('hsame')
 #    h_fakes.Draw('hsame')
     h_ewk.Draw('hsame')
-    h_tt.Draw('hsame')
+#    h_tt.Draw('hsame')
     h_data.Draw('e1same')
     h_tot.Draw('e2same')
 
-    leg = ROOT.TLegend(0.7,0.5,0.9,0.75)
+    leg = ROOT.TLegend(0.7,0.4,0.9,0.7)
     styles.SetLegendStyle(leg)
     leg.SetTextSize(0.043)
+    leg.SetHeader(dm)
     leg.AddEntry(h_data,'data','lp')
     leg.AddEntry(h_zll,'Z#rightarrow#mu#mu','f')
     leg.AddEntry(h_ztt,'Z#rightarrow#tau#tau','f')
     leg.AddEntry(h_qcd,'jet#rightarrow#tau fakes','f')
 #    leg.AddEntry(h_fakes,'non-QCD j#rightarrow#tau','f')
-    leg.AddEntry(h_ewk,'EW','f')
-    leg.AddEntry(h_tt,'t#bar{t}','f')
+    leg.AddEntry(h_ewk,'other','f')
+#    leg.AddEntry(h_tt,'t#bar{t}','f')
     if plotLegend: leg.Draw()
 
     styles.CMS_label(upper,era=era)
@@ -249,11 +251,11 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024'])
     parser.add_argument('-c', '--channel', dest='channel', default='mutau')
-    parser.add_argument('-var', '--var', dest='var', default=['m_vis','pt_1','pt_2','eta_1','eta_2','met','rawDeepTau2018v2p5VSmu_2'], nargs='+', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSmu_2'])
-    parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Medium','Tight','VTight'])
-    parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='Tight', choices=['VLoose','Loose','Medium','Tight'])
+    parser.add_argument('-var', '--var', dest='var', default=['m_vis','pt_1','pt_2','eta_1','eta_2'], nargs='+', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSmu_2'])
+    parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
+    parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Medium','Tight'])
-    parser.add_argument('-dm','--dm', dest='dm',default='1prong',choices=['1prong','DM0','DM1','3prong'])
+    parser.add_argument('-dm','--dm', dest='dm',default='1prong',choices=['1prong','DM0','DM1','3prong','incl'])
     parser.add_argument('-applySF','--applySF',dest='applySF',action='store_true')
     
     args = parser.parse_args()

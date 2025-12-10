@@ -152,15 +152,15 @@ def Plot(hists,**kwargs):
     h_ztt.Draw('hsame')
     if region=='pass':
         h_qcd.Draw('hsame')
-        h_jfakes.Draw('hsame')
+#        h_jfakes.Draw('hsame')
         h_ewk.Draw('hsame')
-        h_tt.Draw('hsame')
+#        h_tt.Draw('hsame')
     h_data.Draw('e1same')
     h_tot.Draw('e2same')
 
     leg = None
     if region=='pass':
-        leg = ROOT.TLegend(0.65,0.40,0.85,0.75)
+        leg = ROOT.TLegend(0.70,0.40,0.90,0.75)
     else:
         leg = ROOT.TLegend(0.25,0.57,0.5,0.78)
     styles.SetLegendStyle(leg)
@@ -170,7 +170,7 @@ def Plot(hists,**kwargs):
     leg.AddEntry(h_zll,'Z#rightarrow#mu#mu','f')
     if region=='pass':
         leg.AddEntry(h_ztt,'Z#rightarrow#tau#tau','f')
-        leg.AddEntry(h_qcd,'#j#rightarrow#tau','f')
+        leg.AddEntry(h_qcd,'j#rightarrow#tau misID','f')
 #        leg.AddEntry(h_jfakes,'non-QCD j#rightarrow#tau','f')
         leg.AddEntry(h_ewk,'other','f')
 #        leg.AddEntry(h_tt,'t#bar{t}','f')
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024'])
-    parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Medium','Tight','VTight'])
+    parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
     parser.add_argument('-dm','--dm',dest='dm',default='1prong')
@@ -257,6 +257,7 @@ if __name__ == "__main__":
         print('folder %s does not exist'%(basedir))
         print('You have to produced datacards for era=%s, WP: %sVsJet %sVsMu %sVsE and dm=%s'%(era,wp_vs_jet,wp_vs_mu,wp_vs_e,dm))
     for etabin in utils.etabins:
+
         inputCardsFileName = '%s/%s.root'%(basedir,etabin)
         if os.path.isfile(inputCardsFileName):
             print('datacards file %s'%(inputCardsFileName))

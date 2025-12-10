@@ -15,18 +15,13 @@ from TauFW.Plotter.plot.utils import ensuredir
 #     definition of cuts        #
 #################################
 
-etabins = [
-    'eta0p0to0p9',
-    'eta0p9to1p2',
-    'eta1p2to2p1',
-    'eta2p1to2p5']
-
 colors = [ROOT.kBlack,ROOT.kRed,ROOT.kBlue,ROOT.kGreen]
 markers = [20,21,22,23]
 
 def Plot(hists,**kwargs):
 
     era = kwargs.get('era','2024')
+    coarse = kwargs.get('coarse',False)
     
     ymax = 0
     i = 0
@@ -70,7 +65,11 @@ def Plot(hists,**kwargs):
     print('Creating SF plot')
 
     outfolder = ensuredir(utils.figuresFolder+'/ScaleFactors')
-    canvas.Print('%s/SF_%s_%s.png'%(outfolder,era,suffix))
+    outfile = '%s/SF_%s_%s.png'%(outfolder,era,suffix)
+    if coarse:
+        outfile = '%s/SF_%s_%s_coarse.png'%(outfolder,era,suffix)
+    canvas.Print(outfile)
+    
 
 ############
 #   MAIN   #
@@ -88,9 +87,11 @@ if __name__ == "__main__":
     parser.add_argument('-wpVsJet','--wpVsJet',dest='wpVsJet', nargs='+', default=['Medium'], choices=['Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE',dest='wpVsE', nargs='+', default=['VVLoose'], choices=['VVLoose','Loose','Medium','Tight'])
     parser.add_argument('-discr','--discr',dest='discr',default='VsMu',choices=['VsMu','VsJet','VsE'])
+    parser.add_argument('-coarse','--coarse',dest='coarse',action='store_true')
     args = parser.parse_args()
     
     era = args.era
+    coarse = args.coarse
     wpVsJet = args.wpVsJet[0]
     wpVsE = args.wpVsE[0]
     wpVsMu = args.wpVsMu[0]
@@ -109,6 +110,8 @@ if __name__ == "__main__":
 
     cmssw_base = os.getenv('CMSSW_BASE')
     filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors.root'%(cmssw_base,era)
+    if coarse:
+        filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors_coarse.root'%(cmssw_base,era)
     if os.path.isfile(filename):
         print('opening file %s'%(filename))
     else:
@@ -128,4 +131,4 @@ if __name__ == "__main__":
         hists[namehist] = inputFile.Get('muTauFR_'+name)
         print(name,hists[namehist])
 
-    Plot(hists,era=era,suffix=suffix)
+    Plot(hists,era=era,suffix=suffix,coarse=coarse)
