@@ -4,9 +4,10 @@ from array import array
 import numpy as np
 import os
 
-#############################
-##### General settings ######
-#############################
+############################
+## mu->tau FR measurement ##
+##### General settings #####
+############################
 
 #########################
 # folder for picotuples #
@@ -14,18 +15,24 @@ import os
 #picoFolder='/eos/cms/store/group/phys_tau/TauFW/pico2024/TES_variations'
 picoFolder= {
     '2024': '/eos/cms/store/group/phys_tau/TauFW/pico2024/mutau_FR',
+    'UL2017': '/eos/cms/store/group/phys_tau/rasp/Run2_UL',
     }
-#######################
-#      folders        #
-#######################
-outputFolder = '/afs/cern.ch/work/r/rasp/MuTauFR/selection'
-condorFolder = '/afs/cern.ch/work/r/rasp/MuTauFR/condor'
+####################################################
+# folders needs to be set by user                  #
+# outputFolder - folder to store output RooT files #
+#                with histograms after selection   #
+# condorFolder - folder to store scripts           #
+#                for submitting jobs to condor     #
+####################################################
+outputFolder = '/afs/cern.ch/work/r/rasp/MuTauFR/selection' 
+condorFolder = '/afs/cern.ch/work/r/rasp/MuTauFR/condor' 
 figuresFolder = '/eos/home-r/rasp/php-plots/plots/MuTauFR'
 
 ###################
 # Cross sections  #
 ###################
 
+# k-factors for cross sections at 13.6 TeV
 kfactor_dy_powheg = 6282.6/6731.99 # LO->NNLO+NLO_EW k-factor computed for 13.6 TeV
 kfactor_dy=6282.6/5455.0 # LO->NNLO+NLO_EW k-factor computed for 13.6 TeV
 kfactor_wj=0.93 # LO->NNLO+NLO_EW k-factor computed for 13.6 TeV
@@ -37,6 +44,8 @@ kfactor_wz=1.414 # LO->NNLO+NLO_EW computed for 13.6 TeV
 mc_samples = {
     '2024': {
         #      Name  :  (xsec, nevts, group, split by genmatch_2)
+        #    nevts = -1 implies that total number of events is
+        #               taken from bin 16 of the cutflow histogram
         "DYto2Mu_Bin-MLL-10to50"   : (6744.0, -1, "DY", ['ZTT','ZL','ZJ']),
         "DYto2Mu_Bin-MLL-50to120"  : (2219*kfactor_dy_powheg, -1, "DY", ['ZTT','ZL','ZJ']),
         "DYto2Mu_Bin-MLL-120to200" : (21.65*kfactor_dy_powheg,-1, "DY", ['ZTT','ZL','ZJ']),
@@ -54,23 +63,47 @@ mc_samples = {
         "ZZ" : (12.75*kfactor_zz, -1, "VV", ['VV']),
         "WWto2L2Nu" : (11.79*kfactor_ww, -1, "VV", ['VV']),
         "WWtoLNu2Q" : (48.94*kfactor_ww, -1, "VV", ['VV']),
+    },
+    # taken from file TauFW/Fitter/MuTauFR/samples_v10.py
+    # cross section are taken from HighPT analysis
+    'UL2017': {
+        "DYJetsToLL_M-10to50" :     (21167.,  68480179.0, "DY", ['ZTT','ZL','ZJ']),
+        "DYJetsToLL_M-50"     :     ( 6077., 205238822.0, "DY", ['ZTT','ZL','ZJ']),
+        "WJetsToLNu"          :     (61526.,  78981243.0, "WJ", ['WJ']),
+        "TTTo2L2Nu"           :     ( 88.29, 105859990.0, "TT", ['TTT','TTL','TTJ']),
+        "TTToSemiLeptonic"    :     (365.35, 352462632.0, "TT", ['TTT','TTL','TTJ']),
+        "WWTo2L2Nu"           :     ( 11.09,   7071358.0, "VV", ['VV']),
+        "WZTo2Q2L"            :     ( 6.419,  18136498.0, "VV", ['VV']),
+        "WZTo3LNu"            :     ( 5.213,   6826898.0, "VV", ['VV']),
+        "ZZTo2L2Nu"           :     (0.6008,  40753260.0, "VV", ['VV']),
+        "ZZTo2Q2L"            :     (3.676,   19134840.0, "VV", ['VV']),
+        "ST_t-channel_top"    :     (136.02, 121728252.0, "ST", ['VV']),
+        "ST_t-channel_antitop":     ( 80.95,  65821722.0, "ST", ['VV']),
+        "ST_tW_top"           :     ( 35.85,   8506765.0, "ST", ['VV']),
+        "ST_tW_antitop"       :     ( 35.85,   8433562.0, "ST", ['VV']),
     }
 }
 
 data_samples = {
     '2024': ['Muon0_Run2024C','Muon0_Run2024D','Muon0_Run2024E','Muon0_Run2024F','Muon0_Run2024G','Muon0_Run2024H','Muon0_Run2024I','Muon1_Run2024C','Muon1_Run2024D','Muon1_Run2024E','Muon1_Run2024F','Muon1_Run2024G','Muon1_Run2024H','Muon1_Run2024I'],
+    'UL2017': ['SingleMuon_Run2017B','SingleMuon_Run2017C','SingleMuon_Run2017D','SingleMuon_Run2017E','SingleMuon_Run2017F'],
 }
 
+zptweightName = {
+    '2024' : 'zptweight_nnlo',
+    'UL2017' : 'zptweight',
+    'UL2016_preVFP' : 'zptweight',
+    'UL2016_postVFP' : 'zptweight',
+    }
 
 eraLumi = {
-    '2024' : 109080.,
-    'UL2017' : 49888.,
+    '2024'   : 109080.,
+    'UL2017' :  41480.,
 }
 
 ################
 # Data samples #
 ################
-
 
 procs = ['ZTT','ZL','ZJ','TTT','TTL','TTJ','W','VV']
 
@@ -132,33 +165,59 @@ os_labels = ['os','ss']
 sys_labels = ['up','down']
 # reg labels
 reg_labels = ['pass','fail']
+# dm labels
+dm_labels = ['incl','1prong','DM0','DM1','3prong']
 
 lib_histos = {
     'm_vis': [40,0,200],
     'pt_1' : [40,0,200],
     'pt_2' : [40,0,200],
     'eta_1': [24,-2.4,2.4],
-    'eta_2': [24,-2.4,2.4],
+    'eta_2': [25,-2.5,2.5],
     'met'  : [40,0,200],
     'mt_1' : [40,0,200],
-    'dm_2' : [15,-0.5,14.5],
+    'dm_2' : [12,-0.5,11.5],
     'rawDeepTau2018v2p5VSmu_2' : [50,0.,1.]
 }
 
 etabins = {
-    'eta0p0to0p9' : [0.,0.9],
-    'eta0p9to1p2' : [0.9,1.2],
-    'eta1p2to2p1' : [1.2,2.1],
-    'eta2p1to2p5' : [2.1,2.5],
+    'eta0p0to0p4' : [0.0,0.4],
+    'eta0p4to0p8' : [0.4,0.8],
+    'eta0p8to1p2' : [0.8,1.2],
+    'eta1p2to1p7' : [1.2,1.7],
+    'eta1p7to2p5' : [1.7,2.5],
+    'eta1p2to2p5' : [1.2,2.5],
+}
+
+etaRanges1 = {
+    'eta0p0to0p4' : [0.0,0.4],
+    'eta0p4to0p8' : [0.4,0.8],
+    'eta0p8to1p2' : [0.8,1.2],
+    'eta1p2to1p7' : [1.2,1.7],
+    'eta1p7to2p5' : [1.7,2.5],
+}
+
+etaRanges2 = {
+    'eta0p0to0p4' : [0.0,0.4],
+    'eta0p4to0p8' : [0.4,0.8],
+    'eta0p8to1p2' : [0.8,1.2],
+    'eta1p2to2p5' : [1.2,2.5],
 }
 
 
-def defineSuffix(channel,era,wpVsJet,wpVsMu,wpVsE,prong,applySF):
+
+etaTitle = {
+    'eta0p0to0p4' : '|#eta|<0.4',
+    'eta0p4to0p8' : '0.4<|#eta|<0.8',
+    'eta0p8to1p2' : '0.8<|#eta|<1.2',
+    'eta1p2to1p7' : '1.2<|#eta|<1.7',
+    'eta1p7to2p5' : '1.7<|#eta|<2.5',
+    'eta1p2to2p5' : '1.2<|#eta|<2.5',
+}
+
+
+def defineSuffix(channel,era,wpVsJet,wpVsMu,wpVsE,applySF):
     suffix = f'{channel}_{era}_{wpVsJet}VsJet_{wpVsMu}VsMu_{wpVsE}VsE'
-    if prong==1:
-        suffix += '_1pr'
-    if prong==3:
-        suffux += '_3pr'
     if applySF:
         suffix += '_SF'
     return suffix
@@ -200,6 +259,14 @@ def zeroBinContentErrors(hist):
         hist.SetBinError(i,0.)
         hist.SetBinContent(i,0.)
 
+def removeNegativeBins(hist):
+    nbins = hist.GetNbinsX()
+    for i in range(1,nbins+1):
+        x = hist.GetBinContent(i)
+        if x<0.1:
+            hist.SetBinContent(i,0.1)
+        
+        
 def createUnitHisto(hist,histName):
     nbins = hist.GetNbinsX()
     unitHist = hist.Clone(histName)

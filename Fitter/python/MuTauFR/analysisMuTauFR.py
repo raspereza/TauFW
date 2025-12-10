@@ -16,22 +16,17 @@ def DeclareHistos(baseNames):
             xmax = utils.lib_histos[var][2]        
             xbins = utils.createBins(nbins,xmin,xmax)
             for sign in utils.os_labels:
-                histname = '%s_%s_%s'%(baseName,var,sign)
-                hists[histname] = ROOT.TH1D(histname,"",nbins,array('d',list(xbins)))
-                if var=='m_vis':
-                    for reg in utils.reg_labels:
-                        histname = '%s_%s_%s_%s'%(baseName,var,sign,reg)
-                        hists[histname] = ROOT.TH1D(histname,"",nbins,array('d',list(xbins)))
-                        for sys in utils.sys_labels:
-                            histname = '%s_%s_%s_%s_%s'%(baseName,var,sign,reg,sys)
-                            hists[histname] = ROOT.TH1D(histname,"",nbins,array('d',list(xbins)))
-                        for etabin in utils.etabins:
-                            histname = '%s_%s_%s_%s_%s'%(baseName,var,sign,reg,etabin)
-                            hists[histname] = ROOT.TH1D(histname,"",nbins,array('d',list(xbins)))
-                            for sys in utils.sys_labels:
-                                histname = '%s_%s_%s_%s_%s_%s'%(baseName,var,sign,reg,etabin,sys)
+                for dm in utils.dm_labels:
+                    histname = '%s_%s_%s_%s'%(baseName,var,sign,dm)
+                    hists[histname] = ROOT.TH1D(histname,"",nbins,array('d',list(xbins)))
+                    if var=='m_vis':
+                        for reg in utils.reg_labels:
+                            for etabin in utils.etabins:
+                                histname = '%s_%s_%s_%s_%s_%s'%(baseName,var,sign,dm,reg,etabin)
                                 hists[histname] = ROOT.TH1D(histname,"",nbins,array('d',list(xbins)))
-
+                                for sys in utils.sys_labels:
+                                    histname = '%s_%s_%s_%s_%s_%s_%s'%(baseName,var,sign,dm,reg,etabin,sys)
+                                    hists[histname] = ROOT.TH1D(histname,"",nbins,array('d',list(xbins)))
     return hists
 
 class sampleMuTauFR:
@@ -71,10 +66,12 @@ class sampleMuTauFR:
         self.sampleName = sample
         self.sampleFile = ROOT.TFile(filename,"READ")
         self.sampleTree = self.sampleFile.Get("tree")
+        self.ZPtweightName = ''
         if self.processName=='TT':
             self.applyTopWeight = True
         if self.processName=='DY':
             self.applyZptWeight = True
+            self.ZPtweightName = utils.zptweightName[era]
 
         self.split = True
         if len(self.baseNames)!=3:
@@ -106,7 +103,6 @@ class sampleMuTauFR:
         print('Setting config for sample %s ->'%(self.sampleName))
         self.scaleFactor = scaleFactor
         self.momScale = kwargs.get('momScale',0.03)
-        self.prong = kwargs.get('prong',0)
         self.muonPtCut = kwargs.get('muonPtCut',26.)
         self.tauPtCut  = kwargs.get('tauPtCut',22.)
         self.muonEtaCut = kwargs.get('muonEtaCut',2.4)
@@ -116,8 +112,7 @@ class sampleMuTauFR:
         self.drCut = kwargs.get('drCut',0.5)
         self.antiJet = kwargs.get('antiJet',5)
         self.antiMu = kwargs.get('antiMu',1)
-        self.antiE  = kwargs.get('antiE',2)
-        print('')
+        self.antiE  = kwargs.get('antiE',2)        
         print("Setting cuts for Z->tau(mu)tau(h) selection")
         print("muonPtCut",self.muonPtCut)
         print("muonEtaCut",self.muonEtaCut)
@@ -130,7 +125,6 @@ class sampleMuTauFR:
         print("antiMu",self.antiMu)
         print("antiE",self.antiE)
         print('momScale',self.momScale)
-        print('prong',self.prong)
         
     def CreateHistosMuTau(self,start,period):
 
@@ -142,7 +136,6 @@ class sampleMuTauFR:
         applyZptWeight = self.applyZptWeight
         applyTopWeight = self.applyTopWeight
         momScale = self.momScale
-        prong = self.prong
         ismc = self.ismc 
         isdata = self.isdata
         processName = self.processName
@@ -205,7 +198,7 @@ class sampleMuTauFR:
             tree.SetBranchAddress('idisoweight_1',idisoweight_1)
             tree.SetBranchAddress('genmatch_2',genmatch_2)
             if applyZptWeight:
-                tree.SetBranchAddress('zptweight_nnlo',mcweight)
+                tree.SetBranchAddress(self.ZPtweightName,mcweight)
             if applyTopWeight:
                 tree.SetBranchAddress('ttptweight',mcweight)
 
@@ -262,19 +255,24 @@ class sampleMuTauFR:
             if math.fabs(eta_2[0])>self.tauEtaCut: continue
             # cut on tau pT will be applied later
 
-            dmcut = dm_2[0]==0 or dm_2[0]==1 or dm_2[0]==10 or dm_2[0]==11
-            if prong==1:
-                dmcut = dm_2[0]==0 or dm_2[0]==1
-            if prong==3:
-                dmcut = dm_2[0]==10 or dm_2[0]==11
-            if not dmcut: continue
-            
             # tau discriminator against e and mu and jet
             if idDeepTau2018v2p5VSe_2[0]<self.antiE: continue
             if idDeepTau2018v2p5VSjet_2[0]<self.antiJet: continue
 
+            dmcut = dm_2[0]==0 or dm_2[0]==1 or dm_2[0]==10 or dm_2[0]==11
+            if not dmcut: continue
+            dm_flags = {}
+            for dm in utils.dm_labels:
+                dm_flags[dm] = False
+
+            dm_flags['incl'] = True
+            if dm_2[0]==0: dm_flags['DM0'] = True
+            if dm_2[0]==1: dm_flags['DM1'] = True
+            if dm_2[0]==0 or dm_2[0]==1: dm_flags['1prong'] = True
+            if dm_2[0]==10 or dm_2[0]==11: dm_flags['3prong'] = True
+
             baseName = self.baseNames[0]
-            if self.split:
+            if split:
                 baseName = self.baseNames[2]
                 if genmatch_2[0]==5:
                     baseName = self.baseNames[0]
@@ -291,20 +289,34 @@ class sampleMuTauFR:
                     Weight *= mcweight[0]
 #                    print(applyZptWeight,applyTopWeight)
 #                    print('mcweight ',mcweight[0])
-#                if scaleFactor!=None:
-#                    if sign_label=='os':
-#                       sf = scaleFactor.getSF(eta_2[0],tauType)
-#                        Weight *= sf
+                if scaleFactor!=None:
+                    sf = 1
+                    if genmatch_2[0]==2 or genmatch_2[0]==4:
+                        sf = scaleFactor.getSF(eta_2[0],'muTauFR')
+#                        print('muon fake SF %5.3f'%(sf))
+                    if genmatch_2[0]==0:
+                        sf = scaleFactor.getSF(eta_2[0],'jetTauFR')
+#                        print('jet fake SF %5.3f'%(sf))
+                    if genmatch_2[0]==5:
+                        sf = scaleFactor.getSF(eta_2[0],'tauID')
+#                        print('tauID SF %5.3f'%(sf))
+                    Weight *= sf
 
             sign_label = 'ss'
             if (q_1[0]*q_2[0])<0:
                 sign_label = 'os'
 
+            if sign_label == 'ss':
+                if scaleFactor!=None:
+                    sf = scaleFactor.getSF(eta_2[0],'qcdNorm')
+#                    print('QCD factor %5.3f'%(sf))
+                    Weight *= sf
+                
             reg_label = 'pass'
             if idDeepTau2018v2p5VSmu_2[0]<self.antiMu:
                 reg_label = 'fail'
 
-            eta_label = 'eta0p0to0p9'
+            eta_label = 'eta0p0to0p4'
             for etabin in utils.etabins:
                 etamin = utils.etabins[etabin][0]
                 etamax = utils.etabins[etabin][1]
@@ -314,10 +326,10 @@ class sampleMuTauFR:
 #            print(eta_2[0],eta_label)
 
             if pt_2[0]>self.tauPtCut:
-                name = '%s_m_vis_%s_%s'%(baseName,sign_label,reg_label)
-                hists[name].Fill(m_vis[0],Weight)
-                name = '%s_m_vis_%s_%s_%s'%(baseName,sign_label,reg_label,eta_label)
-                hists[name].Fill(m_vis[0],Weight)
+                for dm in dm_flags:
+                    if dm_flags[dm]:
+                        name = '%s_m_vis_%s_%s_%s_%s'%(baseName,sign_label,dm,reg_label,eta_label)
+                        hists[name].Fill(m_vis[0],Weight)
                 
             for sys in utils.sys_labels:
                 pt2 = pt_2[0]*(1.0+momScale)
@@ -326,17 +338,16 @@ class sampleMuTauFR:
                     pt2 = pt_2[0]*(1.0-momScale)
                     mvis = m_vis[0]*(1.0-0.5*momScale)
                 if pt2>self.tauPtCut:
-                    name = '%s_m_vis_%s_%s_%s'%(baseName,sign_label,reg_label,sys)
-                    hists[name].Fill(mvis,Weight)
-                    name = '%s_m_vis_%s_%s_%s_%s'%(baseName,sign_label,reg_label,eta_label,sys)
-                    hists[name].Fill(mvis,Weight)
+                    for dm in dm_flags:
+                        if dm_flags[dm]:
+                            name = '%s_m_vis_%s_%s_%s_%s_%s'%(baseName,sign_label,dm,reg_label,eta_label,sys)
+                            hists[name].Fill(mvis,Weight)
 
             if pt_2[0]<self.tauPtCut:
                 continue
             
-            var = 'rawDeepTau2018v2p5VSmu_2'
-            name = '%s_%s_%s'%(baseName,var,sign_label)
-            hists[name].Fill(rawDeepTau2018v2p5VSmu_2[0],Weight)
+            name = '%s_rawDeepTau2018v2p5VSmu_2_%s_1prong'%(baseName,sign_label)
+            if dm_flags['1prong'] : hists[name].Fill(rawDeepTau2018v2p5VSmu_2[0],Weight)
             
             if idDeepTau2018v2p5VSmu_2[0]<self.antiMu:
                 continue
@@ -353,8 +364,10 @@ class sampleMuTauFR:
 
             if pt_2[0]>self.tauPtCut:
                 for variable in variables:
-                    name = '%s_%s_%s'%(baseName,variable,sign_label)
-                    hists[name].Fill(variables[variable],Weight)
+                    for dm in dm_flags:
+                        if dm_flags[dm]:
+                            name = '%s_%s_%s_%s'%(baseName,variable,sign_label,dm)
+                            hists[name].Fill(variables[variable],Weight)
             
         for hist in hists:
             hists[hist].Scale(self.norm)
