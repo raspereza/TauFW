@@ -9,11 +9,6 @@ import TauFW.Fitter.MuTauFR.styles as styles
 from TauFW.Plotter.plot.utils import ensuredir
 from array import array
 import os
-import CombineHarvester.CombineTools.ch as ch
-
-#################################
-#     definition of cuts        #
-#################################
 
 def createEmptyHisto(hist,name):
     nbins = hist.GetNbinsX()
@@ -36,7 +31,6 @@ def copyHisto(histo1,histo2):
 regions = ['pass','fail']
 samples = ['data_obs','ZTT','ZJ','ZL','TTT','TTL','TTJ','VV','W','QCD']
 mc_samples = ['ZTT','ZJ','ZL','TTT','TTL','TTJ','VV','W','QCD']
-
 
 #################################
 ###### plotting subroutine ######
@@ -224,7 +218,7 @@ if __name__ == "__main__":
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024'])
+    parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024','2025','UL2017','UL2016_preVFP','UL2016_postVFP'])
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])

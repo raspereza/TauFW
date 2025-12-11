@@ -66,13 +66,13 @@ if __name__ == "__main__":
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024'])
+    parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024','2025','UL2017','UL2016_preVFP','UL2016_postVFP'])
     parser.add_argument('-c','--channel',dest='channel',default='mutau',choices=['mutau','mumu'])
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
     parser.add_argument('-applySF','--applySF', dest='applySF',action='store_true')
-    parser.add_argument('-period','--period',dest='period',type=int,default=10000000)
+    parser.add_argument('-period','--period',dest='period',type=int,default=5000000)
     args = parser.parse_args()
 
     era = args.era
