@@ -215,7 +215,6 @@ etaTitle = {
     'eta1p2to2p5' : '1.2<|#eta|<2.5',
 }
 
-
 def defineSuffix(channel,era,wpVsJet,wpVsMu,wpVsE,applySF):
     suffix = f'{channel}_{era}_{wpVsJet}VsJet_{wpVsMu}VsMu_{wpVsE}VsE'
     if applySF:
