@@ -69,7 +69,7 @@ mc_samples = {
     'UL2017': {
         "DYJetsToLL_M-10to50" :     (21167.,  68480179.0, "DY", ['ZTT','ZL','ZJ']),
         "DYJetsToLL_M-50"     :     ( 6077., 205238822.0, "DY", ['ZTT','ZL','ZJ']),
-        "WJetsToLNu"          :     (61526.,  78981243.0, "WJ", ['WJ']),
+        "WJetsToLNu"          :     (61526.,  78981243.0, "WJ", ['W']),
         "TTTo2L2Nu"           :     ( 88.29, 105859990.0, "TT", ['TTT','TTL','TTJ']),
         "TTToSemiLeptonic"    :     (365.35, 352462632.0, "TT", ['TTT','TTL','TTJ']),
         "WWTo2L2Nu"           :     ( 11.09,   7071358.0, "VV", ['VV']),

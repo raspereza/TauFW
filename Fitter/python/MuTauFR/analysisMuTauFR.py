@@ -284,7 +284,9 @@ class sampleMuTauFR:
                     
             Weight = 1.0
             if ismc:
-                Weight = genweight[0]*puweight[0]*idisoweight_1[0]
+                Weight = genweight[0]*puweight[0]*idisoweight_1[0]/abs(genweight[0])
+#                print(genweight[0],puweight[0],idisoweight_1[0])
+#                print(Weight)
                 if applyZptWeight or applyTopWeight:
                     Weight *= mcweight[0]
 #                    print(applyZptWeight,applyTopWeight)
