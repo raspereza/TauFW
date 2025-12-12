@@ -34,13 +34,5 @@ if __name__ == "__main__":
                         wpVsMu=args.wpVsMu,
                         wpVsJet=args.wpVsJet,
                         wpVsE=args.wpVsE,
-                        dm=args.dm,
-                        coarse=True)
-    
-    ExtractScaleFactors(era=args.era,
-                        wpVsMu=args.wpVsMu,
-                        wpVsJet=args.wpVsJet,
-                        wpVsE=args.wpVsE,
-                        dm=args.dm,
-                        coarse=False)
+                        dm=args.dm)
     

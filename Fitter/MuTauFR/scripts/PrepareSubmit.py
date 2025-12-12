@@ -8,7 +8,6 @@ import os
 
 def SubmitJob(**kwargs):
     era = kwargs.get('era','2024')
-    chan = kwargs.get('channel','mutau')
     sample = kwargs.get('sample','Muon0_2024B')
     start = kwargs.get('start',0)
     period = kwargs.get('period',10000000)
@@ -30,7 +29,7 @@ def SubmitJob(**kwargs):
     f.write('cmsenv\n')
     f.write('cd TauFW/Fitter/MuTauFR\n')
     f.write('echo $PWD\n')
-    commandline = f'./scripts/RunSelectionMuTau.py --era {era} --channel {chan} --sample {sample} --start {start} --period {period} --wpVsJet {wpVsJet} --wpVsMu {wpVsMu} --wpVsE {wpVsE}'
+    commandline = f'./scripts/RunSelectionMuTau.py --era {era} --sample {sample} --start {start} --period {period} --wpVsJet {wpVsJet} --wpVsMu {wpVsMu} --wpVsE {wpVsE}'
     if applySF:
         commandline += ' --applySF\n'
     else:
@@ -100,7 +99,6 @@ if __name__ == "__main__":
         for iperiod in range(0,nperiods+1):
             command = SubmitJob(era=era,
                                 condor_folder=condor_folder,
-                                channel=channel,
                                 sample=sample,
                                 wpVsJet=wpVsJet,
                                 wpVsMu=wpVsMu,
@@ -113,11 +111,10 @@ if __name__ == "__main__":
     for sample in utils.mc_samples[era]:
         sampleToProcess = analysis.sampleMuTauFR(era,channel,sample)
         nentries = sampleToProcess.GetEntries()
-        nperiods = int(nentries/period)
+        nperiods = int(nentries/period)+1
         print(f'{sample}  entries={nentries}  nperiods={nperiods}')
         for iperiod in range(0,nperiods+1):
             command = SubmitJob(era=era,
-                                channel=channel,
                                 condor_folder=condor_folder,
                                 sample=sample,
                                 wpVsJet=wpVsJet,

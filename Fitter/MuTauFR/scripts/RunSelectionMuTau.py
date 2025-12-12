@@ -48,7 +48,7 @@ if __name__ == "__main__":
     scaleFactor = None
     if applySF:
         cmssw_base = os.getenv('CMSSW_BASE')
-        filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors_coarse.root'%(cmssw_base,era)
+        filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors.root'%(cmssw_base,era)
         scaleFactor = TauScaleFactor(filename=filename,wpVsJet=wpVsJet,wpVsMu=wpVsMu,wpVsE=wpVsE)
     
     sampleToProcess = analysis.sampleMuTauFR(era,channel,sample)
