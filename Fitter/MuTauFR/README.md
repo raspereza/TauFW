@@ -1,6 +1,31 @@
 # Measurement of mu->tau fake rate scale factors
 
-Measurement requires specialized picotuples produced for a cpecific era by the module ()
+## Installation
+
+```
+export CMSSW=CMSSW_14_1_0_pre4
+export SCRAM_ARCH el9_amd64_gcc10
+cmsrel $CMSSW
+cd $CMSSW/src
+cmsenv
+git clone https://github.com/raspereza/TauFW.git
+git checkout 2024dev
+
+# Installation of combine utility
+git -c advice.detachedHead=false clone --depth 1 --branch v10.4.1 https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
+cd HiggsAnalysis/CombinedLimit
+scramv1 b clean; scramv1 b -j$(nproc --ignore=2)
+
+# Installation of Combine Harvester
+git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
+# IMPORTANT: Checkout the recommended tag on the link above
+git clone https://github.com/cms-analysis/CombineHarvester.git CombineHarvester
+git checkout v3.0.0-pre1
+scram b
+
+```
+
+Measurement requires specialized picotuples produced for a cpecific era by dedicated pico producer [`TauFW/PicoProducer/python/analysis/Run3_DEV/ModuleMuTau_Inclusive.py`](https://github.com/raspereza/TauFW/blob/2024dev/PicoProducer/python/analysis/Run3_DEV/ModuleMuTau_Inclusive.py)
 
 ## Structure of the code
 The software package includes two components. 
