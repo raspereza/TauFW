@@ -24,7 +24,6 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024'])
-    parser.add_argument('-c', '--channel', dest='channel', default='mutau')
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
@@ -39,7 +38,7 @@ if __name__ == "__main__":
     wpVsJet = args.wpVsJet
     wpVsMu = args.wpVsMu
     wpVsE = args.wpVsE
-    chan = args.channel
+    chan = 'mutau'
     dm = args.dm
     runFit = args.runFit
     extractSF = args.extractSF

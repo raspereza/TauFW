@@ -24,7 +24,6 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024','2025','UL2017','UL2016_preVFP','UL2016_postVFP'])
-    parser.add_argument('-c','--channel',dest='channel',default='mutau',choices=['mutau','mumu'])
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
@@ -35,7 +34,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     era = args.era
-    channel = args.channel
+    channel = 'mutau'
     start = args.start 
     period = args.period
     
@@ -49,7 +48,7 @@ if __name__ == "__main__":
     scaleFactor = None
     if applySF:
         cmssw_base = os.getenv('CMSSW_BASE')
-        filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors.root'%(cmssw_base,era)
+        filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors_coarse.root'%(cmssw_base,era)
         scaleFactor = TauScaleFactor(filename=filename,wpVsJet=wpVsJet,wpVsMu=wpVsMu,wpVsE=wpVsE)
     
     sampleToProcess = analysis.sampleMuTauFR(era,channel,sample)
