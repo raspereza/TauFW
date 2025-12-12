@@ -38,6 +38,7 @@ class sampleMuTauFR:
         self.baseNames = []
         self.applyZptWeight = False
         self.applyTopWeight = False
+        self.era = era
         if sample in utils.data_samples[era]:
             self.isdata = True
             self.ismc = False
@@ -284,7 +285,10 @@ class sampleMuTauFR:
                     
             Weight = 1.0
             if ismc:
-                Weight = genweight[0]*puweight[0]*idisoweight_1[0]/abs(genweight[0])
+                if self.era=='2024':
+                    Weight = genweight[0]*puweight[0]*idisoweight_1[0]
+                else:
+                    Weight = genweight[0]*puweight[0]*idisoweight_1[0]/abs(genweight[0])
 #                print(genweight[0],puweight[0],idisoweight_1[0])
 #                print(Weight)
                 if applyZptWeight or applyTopWeight:

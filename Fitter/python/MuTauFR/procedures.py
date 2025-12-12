@@ -189,20 +189,20 @@ def WriteDatacards(**kwargs):
 
         cb.cp().process(mc_backgrounds+signals).AddSyst(cb, 'lumi_2024',   'lnN', ch.SystMap()(1.026))
         cb.cp().process(mc_backgrounds+signals).AddSyst(cb, 'CMS_eff_mu',  'lnN', ch.SystMap()(1.02))
-#        cb.cp().process(['TTT','ZTT'])         .AddSyst(cb, 'CMS_eff_t',   'lnN', ch.SystMap()(1.10))
-        cb.cp().process(['ZJ','TTJ','W'])      .AddSyst(cb, 'jet_to_tauFR','lnN', ch.SystMap()(1.20))
+        cb.cp().process(['TTT','ZTT'])         .AddSyst(cb, 'CMS_eff_t',   'lnN', ch.SystMap()(1.15))
+        cb.cp().process(['ZJ','TTJ','W'])      .AddSyst(cb, 'jet_to_tauFR','lnN', ch.SystMap()(1.15))
         cb.cp().process(['TTT','TTL','TTJ'])   .AddSyst(cb, 'xsec_top',    'lnN', ch.SystMap()(1.06))
         cb.cp().process(['VV'])                .AddSyst(cb, 'xsec_vv',     'lnN', ch.SystMap()(1.06))
         cb.cp().process(['ZL','ZTT','ZJ'])     .AddSyst(cb, 'xsec_zjets',  'lnN', ch.SystMap()(1.03))
         cb.cp().process(['W'])                 .AddSyst(cb, 'xsec_wjets',  'lnN', ch.SystMap()(1.08))
-        cb.cp().process(['QCD'])               .AddSyst(cb, 'normQCD',     'lnN', ch.SystMap()(1.20))
+        cb.cp().process(['QCD'])               .AddSyst(cb, 'normQCD',     'lnN', ch.SystMap()(1.15))
         #        cb.cp().process(['bkgd'])              .AddSyst(cb, 'normBKGD',    'lnN', ch.SystMap()(1.20))
         
         #        cb.cp().AddSyst(cb, 'norm_zmm', 'rateParam', ch.SystMap('process')(['ZL'],1.0)) #12.09.23 Stepan Zakharov    
         #        cb.cp().GetParameter('norm_zmm').set_range(0.5,6)
         
-        cb.cp().process(['ZTT','TTT']).AddSyst(cb, 'tauID', 'rateParam', ch.SystMap('bin_id')([1],1.00)) # unconstrained tauID
-        cb.cp().GetParameter('tauID').set_range(0.5,1.5)
+#        cb.cp().process(['ZTT','TTT']).AddSyst(cb, 'tauID', 'rateParam', ch.SystMap('bin_id')([1],1.00)) # unconstrained tauID
+#        cb.cp().GetParameter('tauID').set_range(0.5,1.5)
         
         cb.cp().process(['ZTT','TTT'])              .AddSyst(cb, 'TES', 'shape', ch.SystMap()(1.0))
         cb.cp().process(['ZL','TTL'])               .AddSyst(cb, 'FES', 'shape', ch.SystMap()(1.0))
