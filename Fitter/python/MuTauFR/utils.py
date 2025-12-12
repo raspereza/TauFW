@@ -186,7 +186,6 @@ etabins = {
     'eta0p8to1p2' : [0.8,1.2],
     'eta1p2to1p7' : [1.2,1.7],
     'eta1p7to2p5' : [1.7,2.5],
-    'eta1p2to2p5' : [1.2,2.5],
 }
 
 etaRanges1 = {
@@ -204,15 +203,12 @@ etaRanges2 = {
     'eta1p2to2p5' : [1.2,2.5],
 }
 
-
-
 etaTitle = {
     'eta0p0to0p4' : '|#eta|<0.4',
     'eta0p4to0p8' : '0.4<|#eta|<0.8',
     'eta0p8to1p2' : '0.8<|#eta|<1.2',
     'eta1p2to1p7' : '1.2<|#eta|<1.7',
     'eta1p7to2p5' : '1.7<|#eta|<2.5',
-    'eta1p2to2p5' : '1.2<|#eta|<2.5',
 }
 
 def defineSuffix(channel,era,wpVsJet,wpVsMu,wpVsE,applySF):

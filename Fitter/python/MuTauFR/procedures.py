@@ -18,15 +18,10 @@ def ExtractScaleFactors(**kwargs):
     wpVsJet = kwargs.get('wpVsJet','Medium')
     wpVsE = kwargs.get('wpVsE','VVLoose')
     dm = kwargs.get('dm','1prong')
-    coarse = kwargs.get('coarse',False)
     
     cmssw_base = os.getenv('CMSSW_BASE')
     name = f'{era}_{wpVsJet}VsJet_{wpVsMu}VsMu_{wpVsE}VsE_{dm}'
     outname = name
-    etaRange = utils.etaRanges1
-    if coarse:
-        etaRange = utils.etaRanges2
-        outname += '_coarse'
         
     cardsfolder = f'{cmssw_base}/src/TauFW/Fitter/MuTauFR/datacards/{name}'
     print(f'{cardsfolder}')
@@ -40,9 +35,9 @@ def ExtractScaleFactors(**kwargs):
     nbins = 0
     y = 0
     bins = []
-    for etabin in etaRange:
-        x = etaRange[etabin][0]
-        y = etaRange[etabin][1]
+    for etabin in utils.etabins:
+        x = utils.etabins[etabin][0]
+        y = utils.etabins[etabin][1]
         bins.append(x)
         nbins += 1
     bins.append(y)
@@ -52,7 +47,7 @@ def ExtractScaleFactors(**kwargs):
     qcdNorm = []
     tauID = []
     ib = 1
-    for etabin in etaRange:
+    for etabin in utils.etabins:
 
         inputFitFileName = '%s/%s_fit.root'%(cardsfolder,etabin)
         if not os.path.isfile(inputFitFileName):
@@ -187,22 +182,20 @@ def WriteDatacards(**kwargs):
         cb.AddProcesses(   ['*'], ['MuTauFR'], ['%s'%(era)], ['mutau'], signals,     categories['mutau_pass'], True) # adding signals
         cb.AddProcesses(   ['*'], ['MuTauFR'], ['%s'%(era)], ['mutau'], signals,     categories['mutau_fail'], True) # adding signals
 
-        cb.cp().process(mc_backgrounds+signals).AddSyst(cb, 'lumi_2024',   'lnN', ch.SystMap()(1.026))
+        cb.cp().process(mc_backgrounds+signals).AddSyst(cb, 'lumi',        'lnN', ch.SystMap()(1.026))
         cb.cp().process(mc_backgrounds+signals).AddSyst(cb, 'CMS_eff_mu',  'lnN', ch.SystMap()(1.02))
-        cb.cp().process(['TTT','ZTT'])         .AddSyst(cb, 'CMS_eff_t',   'lnN', ch.SystMap()(1.15))
-        cb.cp().process(['ZJ','TTJ','W'])      .AddSyst(cb, 'jet_to_tauFR','lnN', ch.SystMap()(1.15))
+#        cb.cp().process(['TTT','ZTT'])         .AddSyst(cb, 'CMS_eff_t',   'lnN', ch.SystMap()(1.15))
+        cb.cp().process(['ZJ','TTJ','W'])      .AddSyst(cb, 'jet_to_tauFR','lnN', ch.SystMap()(1.20))
         cb.cp().process(['TTT','TTL','TTJ'])   .AddSyst(cb, 'xsec_top',    'lnN', ch.SystMap()(1.06))
         cb.cp().process(['VV'])                .AddSyst(cb, 'xsec_vv',     'lnN', ch.SystMap()(1.06))
         cb.cp().process(['ZL','ZTT','ZJ'])     .AddSyst(cb, 'xsec_zjets',  'lnN', ch.SystMap()(1.03))
         cb.cp().process(['W'])                 .AddSyst(cb, 'xsec_wjets',  'lnN', ch.SystMap()(1.08))
-        cb.cp().process(['QCD'])               .AddSyst(cb, 'normQCD',     'lnN', ch.SystMap()(1.15))
+        cb.cp().process(['QCD'])               .AddSyst(cb, 'normQCD',     'lnN', ch.SystMap()(1.20))
         #        cb.cp().process(['bkgd'])              .AddSyst(cb, 'normBKGD',    'lnN', ch.SystMap()(1.20))
-        
         #        cb.cp().AddSyst(cb, 'norm_zmm', 'rateParam', ch.SystMap('process')(['ZL'],1.0)) #12.09.23 Stepan Zakharov    
         #        cb.cp().GetParameter('norm_zmm').set_range(0.5,6)
-        
-#        cb.cp().process(['ZTT','TTT']).AddSyst(cb, 'tauID', 'rateParam', ch.SystMap('bin_id')([1],1.00)) # unconstrained tauID
-#        cb.cp().GetParameter('tauID').set_range(0.5,1.5)
+        cb.cp().process(['ZTT','TTT']).AddSyst(cb, 'tauID', 'rateParam', ch.SystMap('bin_id')([1],1.00)) # unconstrained tauID
+        cb.cp().GetParameter('tauID').set_range(0.5,1.5)
         
         cb.cp().process(['ZTT','TTT'])              .AddSyst(cb, 'TES', 'shape', ch.SystMap()(1.0))
         cb.cp().process(['ZL','TTL'])               .AddSyst(cb, 'FES', 'shape', ch.SystMap()(1.0))
@@ -262,31 +255,13 @@ def ExtractHistos(f,bins,**kwargs):
     procs = ['Data','ZTT','ZL','ZJ','TTT','TTL','TTJ','W','VV']
     for proc in procs:
         for sign in ['os','ss']:
-            if etabin=='eta1p2to2p5':
-                name1 = f'{proc}_m_vis_{sign}_{dm}_{region}_eta1p2to1p7'
-                name2 = f'{proc}_m_vis_{sign}_{dm}_{region}_eta1p7to2p5'
-                hist1 = utils.rebinHisto(f.Get(name1),bins,'rebinned')
-                hist2 = utils.rebinHisto(f.Get(name2),bins,'rebinned')
-                hist1.Add(hist1,hist2,1.,1.)
-                outname = f'{proc}_{sign}'
-                hists[outname] = hist1
-            else:
-                name = f'{proc}_m_vis_{sign}_{dm}_{region}_{etabin}'
-                outname = f'{proc}_{sign}'
-                hists[outname] = utils.rebinHisto(f.Get(name),bins,'rebinned')
+            name = f'{proc}_m_vis_{sign}_{dm}_{region}_{etabin}'
+            outname = f'{proc}_{sign}'
+            hists[outname] = utils.rebinHisto(f.Get(name),bins,'rebinned')
             for sys in ['up','down']:
-                if etabin=='eta1p2to2p5':
-                    name1 = f'{proc}_m_vis_{sign}_{dm}_{region}_eta1p2to1p7_{sys}'
-                    name2 = f'{proc}_m_vis_{sign}_{dm}_{region}_eta1p7to2p5_{sys}'
-                    hist1 = utils.rebinHisto(f.Get(name1),bins,'rebinned')
-                    hist2 = utils.rebinHisto(f.Get(name2),bins,'rebinned')
-                    hist1.Add(hist1,hist2,1.,1.)
-                    outname = f'{proc}_{sign}_{sys}'
-                    hists[outname] = hist1
-                else:
-                    name = f'{proc}_m_vis_{sign}_{dm}_{region}_{etabin}_{sys}'
-                    outname = f'{proc}_{sign}_{sys}'
-                    hists[outname] = utils.rebinHisto(f.Get(name),bins,'rebinned')
+                name = f'{proc}_m_vis_{sign}_{dm}_{region}_{etabin}_{sys}'
+                outname = f'{proc}_{sign}_{sys}'
+                hists[outname] = utils.rebinHisto(f.Get(name),bins,'rebinned')
 
     hists_out = {}
     # observed data 
