@@ -29,8 +29,8 @@ def RunImpacts(**kwargs):
         exit()
     
     command = f'cd {folder} ; '
-    command += f' combineTool.py -M Impacts -d {eta}_ws.root --redefineSignalPOIs r_pass --robustFit 1 --cminDefaultMinimizerTolerance 0.05 --X-rtd MINIMIZER_analytic --X-rtd FITTER_NEW_CROSSING_ALGO --cminDefaultMinimizerStrategy 1 -m 90 --doInitialFit ; '
-    command += f' combineTool.py -M Impacts -d {eta}_ws.root --redefineSignalPOIs r_pass --robustFit 1 --cminDefaultMinimizerTolerance 0.05 --X-rtd MINIMIZER_analytic --X-rtd FITTER_NEW_CROSSING_ALGO --cminDefaultMinimizerStrategy 1 -m 90 --doFits ; '
+    command += f' combineTool.py -M Impacts -d {eta}_ws.root --redefineSignalPOIs r_pass --robustHesse 1 --cminDefaultMinimizerTolerance 0.05 --X-rtd MINIMIZER_analytic --X-rtd FITTER_NEW_CROSSING_ALGO --cminDefaultMinimizerStrategy 0 -m 90 --doInitialFit ; '
+    command += f' combineTool.py -M Impacts -d {eta}_ws.root --redefineSignalPOIs r_pass --robustHesse 1 --cminDefaultMinimizerTolerance 0.05 --X-rtd MINIMIZER_analytic --X-rtd FITTER_NEW_CROSSING_ALGO --cminDefaultMinimizerStrategy 0 -m 90 --doFits ; '
     command += f' combineTool.py -M Impacts -d {eta}_ws.root --redefineSignalPOIs r_pass -m 90 -o impacts_{eta}.json ; '
     command += f' plotImpacts.py -i impacts_{eta}.json -o impacts_{eta} ; '
     command += ' cd - '
