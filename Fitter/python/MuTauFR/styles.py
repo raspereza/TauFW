@@ -1,8 +1,8 @@
 import ROOT
 
 #############################################
-# ROOT styles (High tau pT analysis)        #
-# Author : Alexei Raspereza (December 2022) #
+# ROOT styles (mu->tau FR measurement)      #
+# Author : Alexei Raspereza (December 2025) #
 #############################################
 
 eraLumiLabel = {
@@ -19,7 +19,8 @@ eraLumiLabel = {
     "2023D"  : "2023D,  9.5 fb^{-1} (13.6 TeV)",
     "2023"   : "2023,  27.2 fb^{-1} (13.6 TeV)",
     "Run3"   : "Run3, 62.5 fb^{-1} (13.6 TeV)",
-    "2024"   : "2024, 109 fb^{-1} (13.6 TeV)"
+    "2024"   : "2024, 109 fb^{-1} (13.6 TeV)",
+    "2025"   : "2025, 111 fb^{-1} (13.6 TeV)"
 }
 
 def InitROOT():

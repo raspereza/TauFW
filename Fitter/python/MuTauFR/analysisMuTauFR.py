@@ -142,6 +142,7 @@ class sampleMuTauFR:
         processName = self.processName
         split = self.split
         baseNames = self.baseNames
+        era = self.era
         
         # creating histograms 
         hists = DeclareHistos(baseNames)
@@ -195,9 +196,16 @@ class sampleMuTauFR:
 
         if ismc:
             tree.SetBranchAddress('genweight',genweight)
-            tree.SetBranchAddress('puweight',puweight)
-            tree.SetBranchAddress('idisoweight_1',idisoweight_1)
+            if era=='2025':
+                tree.SetBranchAddress('puweight_2025_69p2_v3',puweight)
+                tree.SetBranchAddress('idisoweight_1_2025',idisoweight_1)
+                tree.SetBranchAddress('trigweight_2025',trigweight)
+            else:
+                tree.SetBranchAddress('puweight',puweight)
+                tree.SetBranchAddress('idisoweight_1',idisoweight_1)
+                tree.SetBranchAddress('trigweight',trigweight)
             tree.SetBranchAddress('genmatch_2',genmatch_2)
+            
             if applyZptWeight:
                 tree.SetBranchAddress(self.ZPtweightName,mcweight)
             if applyTopWeight:
@@ -285,8 +293,10 @@ class sampleMuTauFR:
                     
             Weight = 1.0
             if ismc:
-                if self.era=='2024':
+                if era=='2024':
                     Weight = genweight[0]*puweight[0]*idisoweight_1[0]
+                elif era=='2025':
+                    Weight = genweight[0]*puweight[0]*idisoweight_1[0]*trigweight[0]
                 else:
                     Weight = genweight[0]*puweight[0]*idisoweight_1[0]/abs(genweight[0])
 #                print(genweight[0],puweight[0],idisoweight_1[0])
