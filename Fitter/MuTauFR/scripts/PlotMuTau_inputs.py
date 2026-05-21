@@ -222,7 +222,7 @@ if __name__ == "__main__":
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Loose','Medium','Tight'])
-    parser.add_argument('-dm','--dm', dest='dm', default='DM0', choices=['1prong','DM0','DM1'])
+    parser.add_argument('-dm','--dm', dest='dm', default='1prong', choices=['1prong','DM0','DM1'])
     args = parser.parse_args()
 
     era = args.era

@@ -141,9 +141,9 @@ def PlotZtoMuTau(hists,**kwargs):
 
     styles.InitRatioHist(h_ratio)
     if setLogy:
-        h_ratio.GetYaxis().SetRangeUser(0.801,2.299)
+        h_ratio.GetYaxis().SetRangeUser(0.601,1.399)
     else:
-        h_ratio.GetYaxis().SetRangeUser(0.301,1.699)
+        h_ratio.GetYaxis().SetRangeUser(0.601,1.399)
     
     utils.zeroBinErrors(h_zll)
     utils.zeroBinErrors(h_ztt)
@@ -249,7 +249,7 @@ if __name__ == "__main__":
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024','2025','UL2017','UL2016_preVFP','UL2016_postVFP'])
+    parser.add_argument('-e', '--era', dest='era', default='2025', choices=['2024','2025','UL2017','UL2016_preVFP','UL2016_postVFP'])
     parser.add_argument('-var', '--var', dest='var', default=['m_vis','pt_1','pt_2','eta_1','eta_2'], nargs='+', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSmu_2'])
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])

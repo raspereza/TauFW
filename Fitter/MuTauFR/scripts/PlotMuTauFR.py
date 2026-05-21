@@ -82,8 +82,8 @@ if __name__ == "__main__":
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-e', '--era', dest='era', default='2024', choices=['2024','2015','UL2017','UL2016_preVFP','UL2016_postVFP'])
-    parser.add_argument('-wpVsMu','--wpVsMu',dest='wpVsMu', nargs='+', default=['VLoose'], choices=['VLoose','Loose','Medium','Tight'])
+    parser.add_argument('-e', '--era', dest='era', default='2025', choices=['2024','2025','UL2017','UL2016_preVFP','UL2016_postVFP'])
+    parser.add_argument('-wpVsMu','--wpVsMu',dest='wpVsMu', nargs='+', default=['VLoose','Tight'], choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsJet','--wpVsJet',dest='wpVsJet', nargs='+', default=['Medium'], choices=['Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE',dest='wpVsE', nargs='+', default=['VVLoose'], choices=['VVLoose','Loose','Medium','Tight'])
     parser.add_argument('-discr','--discr',dest='discr',default='VsMu',choices=['VsMu','VsJet','VsE'])
