@@ -29,21 +29,21 @@ if __name__ == "__main__":
     era = args.era
     print ('<<<<<<<<<<<<<< working point: ', iwp)
     subfolder = '%sVsJet_%sVsMu_%sVsE'%(wp_vs_jet,iwp,wp_vs_e)
-    path2files = '%s/src/TauFW/Fitter/MuTauFR/input_update/%s'%(os.getenv('CMSSW_BASE'),subfolder)
+    path2files = '%s/src/TauFW/Fitter/MuTauFR/input/%s'%(os.getenv('CMSSW_BASE'),subfolder)
     path2cards = ensuredir('%s/src/TauFW/Fitter/MuTauFR/datacards/%s'%(os.getenv('CMSSW_BASE'),subfolder))
     
     for ieta in eta:
         print('<<<<<<< eta range: ', ieta)
         #cb.SetFlag('workspaces-use-clone', True)
         cb = ch.CombineHarvester()
-        mc_backgrounds_pass = ['ZTT','ZJ','W','ST','TTT','TTL','TTJ', 'VV']
-        mc_backgrounds_fail = ['ZTT','ZJ','W','ST','TTT','TTL','TTJ', 'VV']
+        mc_backgrounds_pass = ['ZTT','ZJ','W','TTT','TTL','TTJ', 'VV']
+        mc_backgrounds_fail = ['ZTT','ZJ','W','TTT','TTL','TTJ', 'VV']
         #        mc_backgrounds_fail = ['ZTT','ZJ','bkgd','W']
-        mc_backgrounds = ['ZTT','ZJ','W','ST','TTT','TTL','TTJ', 'VV']
+        mc_backgrounds = ['ZTT','ZJ','W','TTT','TTL','TTJ', 'VV']
         data_driven_backgrounds = ['QCD']
         backgrounds_pass = mc_backgrounds_pass + data_driven_backgrounds
         backgrounds_fail = mc_backgrounds_fail + data_driven_backgrounds
-        signals = ['ZMM']
+        signals = ['ZL']
         categories = {
             'mutau_pass' : [( 1, '%s_pass'%(iwp) )],
             'mutau_fail' : [( 2, '%s_fail'%(iwp) )],

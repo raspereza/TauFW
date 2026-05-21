@@ -7,7 +7,9 @@ import os
 from collections import OrderedDict
 #from IPython import embed
 #sys.path.append("../../Plotter/") # for config.samples
-from samples_MuTauFR import *
+from samples_2024v15 import *
+# for UL2017 UL2016_preVFP and UL2016_postVFP
+#from config.samples_UL import *
 from TauFW.Plotter.plot.utils import LOG#, STYLE, ensuredir, repkey, Var, Sel
 from TauFW.Fitter.plot.datacard import createinputs, plotinputs, preparesysts #, rename_QCD
 import numpy as np
@@ -307,12 +309,12 @@ if __name__ == "__main__":
                                          help="set channel" )
 #  parser.add_argument('-s', '--serial',  dest='parallel', action='store_false',
 #                                         help="run Tree::MultiDraw serial instead of in parallel" )
-  parser.add_argument('-parallel', '--parallel', type=int, default=20, dest='parallel', 
+  parser.add_argument('-parallel', '--parallel', type=int, default=40, dest='parallel', 
                                          help="threads")
   parser.add_argument('-v', '--verbose', dest='verbosity', type=int, nargs='?', const=1, default=0, action='store',
                                          help="set verbosity" )
   parser.add_argument('-wp_vs_e','--wp_vs_e',dest='wp_vs_e',default='VVLoose',choices=['VVLoose','Tight'])
-  parser.add_argument('-wp_vs_mu','--wp_vs_mu',dest='wp_vs_mu',default='VLoose',choices=['VLoose','Tight'])
+  parser.add_argument('-wp_vs_mu','--wp_vs_mu',dest='wp_vs_mu',default='Medium',choices=['VLoose','Loose','Medium','Tight'])
   parser.add_argument('-wp_vs_jet','--wp_vs_jet',dest='wp_vs_jet',default='Medium',choices=['Medium','Tight'])
   parser.add_argument('-etabin','--etabin',dest='etabin',default='0to0p9',choices=['0to0p9','0p9to1p2','1p2to2p1','2p1to2p5'])
   parser.add_argument('-dry_run','--dry_run',dest='dry_run',action='store_true')
