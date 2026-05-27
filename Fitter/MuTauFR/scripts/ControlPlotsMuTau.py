@@ -141,9 +141,9 @@ def PlotZtoMuTau(hists,**kwargs):
 
     styles.InitRatioHist(h_ratio)
     if setLogy:
-        h_ratio.GetYaxis().SetRangeUser(0.601,1.399)
+        h_ratio.GetYaxis().SetRangeUser(0.201,1.799)
     else:
-        h_ratio.GetYaxis().SetRangeUser(0.601,1.399)
+        h_ratio.GetYaxis().SetRangeUser(0.201,1.799)
     
     utils.zeroBinErrors(h_zll)
     utils.zeroBinErrors(h_ztt)
@@ -182,7 +182,11 @@ def PlotZtoMuTau(hists,**kwargs):
     h_data.Draw('e1same')
     h_tot.Draw('e2same')
 
-    leg = ROOT.TLegend(0.7,0.4,0.9,0.7)
+    leg = None
+    if var=='rawDeepTau2018v2p5VSmu_2':
+        leg = ROOT.TLegend(0.4,0.55,0.7,0.85)
+    else:
+        leg = ROOT.TLegend(0.6,0.4,0.9,0.7)
     styles.SetLegendStyle(leg)
     leg.SetTextSize(0.043)
     leg.SetHeader(dm)
@@ -250,7 +254,7 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('-e', '--era', dest='era', default='2025', choices=['2024','2025','UL2017','UL2016_preVFP','UL2016_postVFP'])
-    parser.add_argument('-var', '--var', dest='var', default=['m_vis','pt_1','pt_2','eta_1','eta_2'], nargs='+', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSmu_2'])
+    parser.add_argument('-var', '--var', dest='var', default=['m_vis','pt_1','pt_2','eta_1','eta_2','rawDeepTau2018v2p5VSmu_2'], nargs='+', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSmu_2'])
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])
     parser.add_argument('-wpVsE','--wpVsE', dest='wpVsE', default='VVLoose', choices=['VVLoose','Medium','Tight'])

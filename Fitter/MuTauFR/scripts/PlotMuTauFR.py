@@ -25,14 +25,17 @@ def Plot(hists,**kwargs):
     
     ymax = 0
     i = 0
+    nbins = 0
     for hist in hists:
-        hists[hist].GetYaxis().SetRangeUser(0.,2.5)
+        nbins = hists[hist].GetNbinsX()
+        hists[hist].GetYaxis().SetRangeUser(0.,5.5)
         styles.InitData(hists[hist])
         hists[hist].SetMarkerColor(colors[i])
         hists[hist].SetLineColor(colors[i])
         hists[hist].SetMarkerStyle(markers[i])
         i += 1
-              
+
+
     # canvas and pads
     canvas = styles.MakeCanvas("canv","",600,600)
 
@@ -106,8 +109,7 @@ if __name__ == "__main__":
         wps = args.wpVsE
         suffix = '%sVsJet_%sVsMu'%(wpVsJet,wpVsMu)
         
-    print('')
-
+            
     cmssw_base = os.getenv('CMSSW_BASE')
     filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors.root'%(cmssw_base,era)
     if coarse:
@@ -130,5 +132,20 @@ if __name__ == "__main__":
         namehist = wp+args.discr
         hists[namehist] = inputFile.Get('muTauFR_'+name)
         print(name,hists[namehist])
+
+    print('')
+    print('')
+    wp_string = ''
+    nbins = 0
+    for hist in hists:
+        wp_string += '  %s'%(hist)
+        nbins = hists[hist].GetNbinsX()
+    for iB in range(1,nbins+1):
+        bin_string = ''
+        for hist in hists:
+            x = hists[hist].GetBinContent(iB)
+            e = hists[hist].GetBinError(iB)
+            bin_string += '  %4.2f+/-%4.2f  '%(x,e)
+        print(bin_string)
 
     Plot(hists,era=era,suffix=suffix,coarse=coarse)
