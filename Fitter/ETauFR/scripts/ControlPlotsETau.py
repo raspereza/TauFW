@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # Author: Alexei Raspereza (October 2025)
-# mu->tau FR SF measurement
+# e->tau FR SF measurement
 # Control plots
 import ROOT
 import math
@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-e', '--era', dest='era', default='2526', choices=['2024','2025','2026','2526','UL2017','UL2016_preVFP','UL2016_postVFP'])
+    parser.add_argument('-e', '--era', dest='era', default='2526', choices=['2025','2026','2526'])
     parser.add_argument('-var', '--var', dest='var', default=['m_vis','pt_1','pt_2','eta_1','eta_2','rawDeepTau2018v2p5VSe_2'], nargs='+', choices=['m_vis','pt_1', 'pt_2', 'eta_1','eta_2', 'mt_1', 'dm_2', 'met', 'rawDeepTau2018v2p5VSe_2'])
     parser.add_argument('-wpVsJet','--wpVsJet', dest='wpVsJet', default='Medium', choices=['Loose','Medium','Tight','VTight'])
     parser.add_argument('-wpVsMu','--wpVsMu', dest='wpVsMu', default='VLoose', choices=['VLoose','Loose','Medium','Tight'])

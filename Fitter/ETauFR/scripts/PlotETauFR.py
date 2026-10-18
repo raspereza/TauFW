@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 # Author: Alexei Raspereza (October 2025)
-# mu->tau FR SF measurement
+# e->tau FR SF measurement
 # Plotting scale factors 
 import ROOT
 import math
-import TauFW.Fitter.MuTauFR.utils as utils
-import TauFW.Fitter.MuTauFR.styles as styles
-import TauFW.Fitter.MuTauFR.analysisMuTauFR as analysis
+import TauFW.Fitter.ETauFR.utils as utils
+import TauFW.Fitter.ETauFR.styles as styles
+import TauFW.Fitter.ETauFR.analysisETauFR as analysis
 from array import array
 import os
 from TauFW.Plotter.plot.utils import ensuredir
@@ -112,9 +112,9 @@ if __name__ == "__main__":
         
             
     cmssw_base = os.getenv('CMSSW_BASE')
-    filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors.root'%(cmssw_base,era)
+    filename = '%s/src/TauFW/Fitter/ETauFR/ScaleFactors/%s_ScaleFactors.root'%(cmssw_base,era)
     if coarse:
-        filename = '%s/src/TauFW/Fitter/MuTauFR/ScaleFactors/%s_ScaleFactors_coarse.root'%(cmssw_base,era)
+        filename = '%s/src/TauFW/Fitter/ETauFR/ScaleFactors/%s_ScaleFactors_coarse.root'%(cmssw_base,era)
     if os.path.isfile(filename):
         print('opening file %s'%(filename))
     else:

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # Author: Alexei Raspereza (October 2025)
-# mu->tau FR SF measurement
-# Script to run mu+tau selection
+# e->tau FR SF measurement
+# Script to run e+tau selection
 import ROOT
 import math
 from array import array
