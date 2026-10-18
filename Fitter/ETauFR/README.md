@@ -118,12 +118,21 @@ where
 
 ## Plotting control distributions
 
-Control plots are produced by script [`TauFW/Fitter/ETauFR/scripts/ControlPlotsETau.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/ControlPlotsETau.py)
+Control plots are produced by script [`TauFW/Fitter/ETauFR/scripts/ControlPlotsETau.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/ControlPlotsETau.py). The following list of arguments should be provided
+* `--era` (string) : data-taking period (2024,2025,2526);
+* `--wpVsJet` (string) : working point of DeepTau vs jet; 
+* `--wpVsMu` (string) : working point of DeepTau vs muon;
+* `--wpVsE` (string) : working point of DeepTau vs electron;
+Flag `--applySF` should be provided in the validation step of the workflow when plotting distributions after applying scale factors.
+
+Plots are saved in the folder
+* `{utils.figuresFolder}/ControlPlots/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`.
+
 
 ## Measurement of e->tau fake rate
 
 The measurement of e->tau fake rate is performed by executing script [`TauFW/Fitter/ETauFR/scripts/RunMeasurements.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/RunMeasurements.py). It calls subroutine accessing histograms
-in the merged RooT file and produces datacards. If flags `--runFit` and `--extractSF` are activated, fits are performed on datacards with `combine tool and e->tau scale factors are extracted from output files produced by `combine`. 
+in the merged RooT file and produces datacards. If flags `--runFit` and `--extractSF` are provided, fits are performed on datacards with `combine` tool and e->tau scale factors are extracted from output files produced by `combine`. 
 Fits are performed individually for each eta bin and decay mode. By default, e->tau fake energy scale is treated as gaussian constrained shape parameter with uncertainty of 0.06. If flag `--fes` is activated, e->tau fake energy scale is treated as unconstrained POI and `ZL` template is morphed when performing fit.
 The script `TauFW/Fitter/ETauFR/RunMeasurements.py` takes the following arguments:
 * `--era` (string) : data-taking period (2024,2025,2526);
@@ -151,12 +160,16 @@ In this case make sure that corresponding datacards are created to perform the f
 ## Plotting results of the fit
 Plotting prefit and postfit distributions for all eta bins and decay modes is performed by script (https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/PlotETau.py). Plots are stored in the folder
 `{utils.figuresFolder}/Fits(_fes)/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`.
-The standard set of arguments is required
-* 
-
+The standard set of arguments is required:
+* `--era`
+* `--wpVsJet`
+* `--wpVsMu`
+* `--wpVsE`
+* `--fes` (if fit is done with e->tau fake energy scale as unconstrained POI)
 
 ## Storing SFs in RooT files
-Scale factors can be extracted from RooT files produced by `combine` and dump to RooT files either in one go with creation of datacards and fitting with script `TauFW/Fitter/ETauFR/scripts/RunMeasurements` as described above or with the script [`TauFW/Fitter/ETauFR/scripts/FitETau.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/ExtractScaleFactors.py) with the following arguments
+
+User can extract scale factors from RooT files produced by `combine` and dump to histograms files either in one go with creation of datacards and fitting with script `TauFW/Fitter/ETauFR/scripts/RunMeasurements` as described above or with the script [`TauFW/Fitter/ETauFR/scripts/FitETau.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/ExtractScaleFactors.py) with the following arguments
 * `--era`
 * `--wpVsJet`
 * `--wpVsMu`
@@ -195,4 +208,6 @@ Standard e+tau selection with taus passing nominal ID can be run once again but 
 Run script `TauFW/Fitter/ETauFR/scripts/PrepareSubmit.py` with an argument `--applySF` following instruction given above. Don't forget to execute scripts submitting condor jobs. You will be reminded by the message issued by the script, e.g. 
 * `Submit jobs by executing file /afs/cern.ch/work/r/rasp/ETauFR/condor/etau_2526_MediumVsJet_LooseVsMu_VVLooseVsE_SF/submit.bash`
 
-Monitor jobs with condor_q. Once jobs are finnished collect them with script `TauFW/Fitter/ETauFR/scripts/HaddSamples.py`. The flag `--applySF` should be passed as argument. Afterwards you can produce control plots with scale factors applied using the script `TauFW/Fitter/ETauFR/scripts/ControlPlotsETau.py`. Once again flag `--applySF` should be passed as argument.  
+Monitor jobs with condor_q. Once jobs are finnished collect them with script `TauFW/Fitter/ETauFR/scripts/HaddSamples.py`. The flag `--applySF` should be passed as argument. Afterwards you can produce control plots with scale factors applied using the script `TauFW/Fitter/ETauFR/scripts/ControlPlotsETau.py`. Once again flag `--applySF` should be passed as an argument. Plots are save in the folder:
+* `{utils.figuresFolder}/ControlPlots/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}_SF`.
+
