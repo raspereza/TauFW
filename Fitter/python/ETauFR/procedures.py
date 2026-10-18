@@ -53,8 +53,6 @@ def ExtractScaleFactors(**kwargs):
         xbin = xmin + float(ib)
         binsDM.append(xbin)
 
-    
-
     nbinsEta = 0
     binsEta = []
     final_bin = 0

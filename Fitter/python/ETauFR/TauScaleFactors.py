@@ -36,8 +36,8 @@ class TauScaleFactor:
         sf = 1.0
         dm_input = 0.5
         if dm==0: dm_input = 0.5
-        else if dm==1: dm_input = 1.5
-        else if dm==10: dm_input = 2.5
-        else if dm==11: dm_input = 3.5
+        elif dm==1: dm_input = 1.5
+        elif dm==10: dm_input = 2.5
+        elif dm==11: dm_input = 3.5
         sf = self.SF[typ].GetBinContent(self.SF[typ].FindBin(absEta,dm_input))
         return sf
