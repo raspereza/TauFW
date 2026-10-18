@@ -35,8 +35,8 @@ Picotuples for eras 2025, 2026 and 2025+2026 are located in
 
 ## Structure of the code
 The software package includes two components. 
-* Utilities and auxiliarly classes. They are located in the folder (`TauFW/Fitter/python/ETauFR`)[https://github.com/raspereza/TauFW/tree/2024dev/Fitter/python/ETauFR].
-* Scripts to run selection, plot control distributions, create datacards for measurement and store scale factors. They are located in the folder (`TauFW/FitterETauFR/scripts`)[https://github.com/raspereza/TauFW/tree/2024dev/Fitter/ETauFR/scripts]
+* Utilities and auxiliarly classes. They are located in the folder [`TauFW/Fitter/python/ETauFR`](https://github.com/raspereza/TauFW/tree/2024dev/Fitter/python/ETauFR).
+* Scripts to run selection, plot control distributions, create datacards for measurement and store scale factors. They are located in the folder [`TauFW/FitterETauFR/scripts`](https://github.com/raspereza/TauFW/tree/2024dev/Fitter/ETauFR/scripts)
 
 ### Utilities and helper classes
 
@@ -84,10 +84,13 @@ on all samples using batch system.
 
 ## Running selection using batch system
 
-Script [`TauFW/Fitter/ETauFR/scripts/PrepareSubmit.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/PrepareSubmit.py) prepares condor config files and executable scripts to process all data and MC tuples for a given era. Each condor job executes `TauFW/Fitter/ETauFR/scripts/RunSelectionETau.py` script. Every data and MC sample is divided into chunks with the number of events specified by parameter `--period`. Last chunk for each sample contains remainder of events. All condor config files and script are put in the directory `$condorFolder/$subfolder`, where `$condorFolder` specified in the file `TauFW/Fitter/python/ETauFR/utils.h` (see above), and `$subfolder` indicates channel, era and specified working points of DeepTau discriminants, e.g. `etau_2526_MediumVsJet_LooseVsMu_VVLooseVsE`. If jobs are run with option `--applySF`, suffix `SF` is added to subfolder name: `etau_2526_MediumVsJet_LooseVsMu_VVLooseVsE_SF`.
+Script [`TauFW/Fitter/ETauFR/scripts/PrepareSubmit.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/PrepareSubmit.py) prepares condor config files and executable scripts to process all data and MC tuples for a given era. Each condor job executes `TauFW/Fitter/ETauFR/scripts/RunSelectionETau.py` script. Every data and MC sample is divided into chunks with the number of events specified by parameter `--period`. Last chunk for each sample contains remainder of events. All condor config files and script are put in the directory `{utils.condorFolder}/{subfolder}`, where `{utils.condorFolder}` is specified in the file `TauFW/Fitter/python/ETauFR/utils.h` (see above), and `{subfolder}` indicates channel (etau), era and specified working points of DeepTau discriminants, e.g.
+* `etau_2526_MediumVsJet_LooseVsMu_VVLooseVsE`.
 
-To submit all jobs to the batch system, user should manually execute bash script named `submit.bash` and placed in the same directory as condor config and executables. The printout produced by the script invites user to execute `submit.bash` script and indicates its location, as exemplified below:  
+If jobs are run with option `--applySF`, suffix `SF` is added to subfolder name:
+* `etau_2526_MediumVsJet_LooseVsMu_VVLooseVsE_SF`.
 
+To submit all jobs to the batch system, user should manually execute bash script named `submit.bash` which is created in the same directory as condor configs and executables for individual jobs. The printout produced by the script reminds user to execute `submit.bash` script and indicates its location, as shown below:  
 * `Submit jobs by executing file /afs/cern.ch/work/r/rasp/ETauFR/condor/etau_2526_MediumVsJet_LooseVsMu_VVLooseVsE/submit.bash`
 
 The script `TauFW/Fitter/ETauFR/scripts/PrepareSubmit.py` takes the following arguments:  
@@ -95,23 +98,24 @@ The script `TauFW/Fitter/ETauFR/scripts/PrepareSubmit.py` takes the following ar
 * `--wpVsJet` (string) : working point of DeepTau vs jet; 
 * `--wpVsMu` (string) : working point of DeepTau vs muon;
 * `--wpVsE` (string) : working point of DeepTau vs electron;
-* `--applySF` : optional flag to apply already measured scale factors;
+* `--applySF` : optional flag to apply already measured scale factors (should not be applied when output of the scripts is intended for measurements);
 * `--period` (int) : number of events per chunk.
 
-The output RooT files with histogram are saved in directory `$outputFolder/$subfolder`, where `$outputFolder` is defined in the python file
-`TauFW/Fitter/python/ETauFR/utils.h` and `$subfolder` follows naming convention explained above.
-Once jobs are finished, seperate RooT files with histograms should be merged with script [`TauFW/Fitter/ETauFR/scripts/HaddSamples.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/HaddSamples.py) passing as arguments era and working points of DeepTau tagger. The output RooT file contain histograms of some kinematic variables produced by applying e+tau selection with taus passing specified. These histograms are intended for monitoring data-simulation agreement. There are also histograms of visible e+tau mass produced for two eta bins (0,1.48,2.5) and four individual decay HPS modes (0,1,10,11). These histograms are produced individually for samples of probes passing and failing anti-electron DeepTau discriminant.  
+The output RooT files with histogram are saved in directory `{utils.outputFolder}/{subfolder}`, where `utils.{outputFolder}` is defined in the python config file `TauFW/Fitter/python/ETauFR/utils.h` and `{subfolder}` follows naming convention explained above.
 
-The control histograms have the following naming convention:
-`[sample]_[var]_[sign]_[DM]`
-where
-* sample : Data, ZTT, ZJ, ZL, TTT, TTL, TTJ, W, VV
-* var : variable-  m_vis, pt_1, pt_2, eta_1, eta_2, met, mt_1
-* sign : os (opposite-sign), ss (same-sign); same-sign selection is needed to estimate QCD background
-* DM : decay mode - incl, DM0, DM1, DM10, DM11
+Once jobs are finished, seperate RooT files with histograms should be merged with script [`TauFW/Fitter/ETauFR/scripts/HaddSamples.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/HaddSamples.py) passing as arguments era and working points of DeepTau tagger.
+
+The output RooT file contain histograms of some kinematic variables produced by applying e+tau selection with taus passing specified. These histograms are intended for monitoring data-simulation agreement. There are also histograms of visible e+tau mass produced for two eta bins (0,1.48,2.5) and four individual decay HPS modes (0,1,10,11). These histograms are produced individually for samples of tau probes passing and failing anti-electron DeepTau discriminant.  
+
+The control histograms have the following naming:
+`{sample}_{var}_{sign}_{DM}`, where
+* sample : Data, ZTT, ZJ, ZL, TTT, TTL, TTJ, W, VV;
+* var : m_vis, pt_1, pt_2, eta_1, eta_2, met, mt_1 (name of kinematic variable)
+* sign : os (opposite-sign), ss (same-sign) (same-sign selection is needed to estimate QCD background);
+* DM : decay mode - incl (inclusive in decay modes), DM0, DM1, DM10, DM11.
 
 Histograms used in fits has the following naming:
-`[sample]_m_vis_[sign]_[DM]_[region]_[etabin]`
+`{sample}_m_vis_{sign}_{DM}_{region}_{etabin}`
 where 
 * region : pass or fail
 * etabin : eta0p0to1p48 and eta1p48to2p5
@@ -125,15 +129,16 @@ Control plots are produced by script [`TauFW/Fitter/ETauFR/scripts/ControlPlotsE
 * `--wpVsE` (string) : working point of DeepTau vs electron;
 Flag `--applySF` should be provided in the validation step of the workflow when plotting distributions after applying scale factors.
 
-Plots are saved in the folder
+Plots are saved in the folder:
 * `{utils.figuresFolder}/ControlPlots/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`.
 
 
 ## Measurement of e->tau fake rate
 
-The measurement of e->tau fake rate is performed by executing script [`TauFW/Fitter/ETauFR/scripts/RunMeasurements.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/RunMeasurements.py). It calls subroutine accessing histograms
-in the merged RooT file and produces datacards. If flags `--runFit` and `--extractSF` are provided, fits are performed on datacards with `combine` tool and e->tau scale factors are extracted from output files produced by `combine`. 
+The measurement of e->tau fake rate is performed by executing script [`TauFW/Fitter/ETauFR/scripts/RunMeasurements.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/RunMeasurements.py). It calls subroutine accessing histograms in the RooT file and produces datacards. If flags `--runFit` and `--extractSF` are provided, fits are performed on datacards with `combine` tool and e->tau scale factors are extracted from output files produced by `combine`.
+
 Fits are performed individually for each eta bin and decay mode. By default, e->tau fake energy scale is treated as gaussian constrained shape parameter with uncertainty of 0.06. If flag `--fes` is activated, e->tau fake energy scale is treated as unconstrained POI and `ZL` template is morphed when performing fit.
+
 The script `TauFW/Fitter/ETauFR/RunMeasurements.py` takes the following arguments:
 * `--era` (string) : data-taking period (2024,2025,2526);
 * `--wpVsJet` (string) : working point of DeepTau vs jet; 
@@ -142,9 +147,10 @@ The script `TauFW/Fitter/ETauFR/RunMeasurements.py` takes the following argument
 Optional flags (see comment above):
 * `--fes` : treat e->tau fake energy scale as POI
 * `--runFit` : runs fit
-* `--extractSF` : extract scale factors from and store them as 2D (eta - decay mode) histograms in RooT files 
+* `--extractSF` : extract scale factors from and store them as 2D (eta - decay mode) histograms in RooT files (explained below).
 
-Inputs, datacards and results of the fit are stored for all tested working of DeepTau in the folder `TauFW/Fitter/ETau/datacards` if flag `--fes` is set, and in the folder `TauFW/Fitter/ETau/datacards_fes` if flag `--fes` is not set. Inside these folders, datacards for specific era and working are stored in individual subfolders, e.g. `2526_MediumVsJet_VLooseVsMu_VVLooseVsE`.
+Inputs, datacards and results of the fit are stored in the folder `TauFW/Fitter/ETau/datacards` if flag `--fes` is set, and in the folder `TauFW/Fitter/ETau/datacards_fes` if flag `--fes` is not set. Inside these folders, datacards for specific era and working points of DeepTau tagger are stored in individual subfolders with the name {era}_{wpVsJet}_{wpVsMu}_{wpVsE}, e.g.
+* `2526_MediumVsJet_VLooseVsMu_VVLooseVsE`.
 
 Fits can be performed separately for each eta bin and decay mode with the script [`TauFW/Fitter/ETauFR/scripts/FitETau.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/FitETau.py) with the following arguments:
 * `--era`
@@ -155,9 +161,10 @@ Fits can be performed separately for each eta bin and decay mode with the script
 * `--dm` : decay mode (DM0, DM1, DM10, DM11)
 * `--etabin` : eta bin (eta0p0to1p48, eta1p48to2p5)
 
-In this case make sure that corresponding datacards are created to perform the fit.
+This option is foreseen for diagnostics and debugging purpose. In this case make sure that corresponding datacards to perform fit have been created.
 
 ## Plotting results of the fit
+
 Plotting prefit and postfit distributions for all eta bins and decay modes is performed by script (https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/PlotETau.py). Plots are stored in the folder
 `{utils.figuresFolder}/Fits(_fes)/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`.
 The standard set of arguments is required:
@@ -169,22 +176,23 @@ The standard set of arguments is required:
 
 ## Storing SFs in RooT files
 
-User can extract scale factors from RooT files produced by `combine` and dump to histograms files either in one go with creation of datacards and fitting with script `TauFW/Fitter/ETauFR/scripts/RunMeasurements` as described above or with the script [`TauFW/Fitter/ETauFR/scripts/FitETau.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/ExtractScaleFactors.py) with the following arguments
+User can extract scale factors from RooT files produced by `combine` and dump to histograms files either in one go with creation of datacards and fitting with script `TauFW/Fitter/ETauFR/scripts/RunMeasurements` as described above or with the script [`TauFW/Fitter/ETauFR/scripts/ExtractScaleFactors.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/ExtractScaleFactors.py) with the following arguments
 * `--era`
 * `--wpVsJet`
 * `--wpVsMu`
 * `--wpVsE`
 * `--fes`
 
-RooT files with the results of the fit are located in the same folder as corresponding datacards, e.g. `TauFW/Fitter/ETauFR/datacards/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`, or if fit was run with option `--fes` `TauFW/Fitter/ETauFR/datacards_fes/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`
+RooT files with the results of the fit are located in the same folder as corresponding datacards, e.g. `TauFW/Fitter/ETauFR/datacards/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`, or if fit was run with option `--fes` - `TauFW/Fitter/ETauFR/datacards_fes/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`
 
-The scale factors are dumped in the RooT file
-`TauFW/Fitter/ETauFR/ScaleFactors(_fes)/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}`. It contains 4 2D histograms
-named
-1. `eTauFR_[wpVsJet]_[wpVsMu]_[wpVsE]` : e->tau fake rate SF;
-2. `FES` : e->tau fake energy scale;
-3. `jetTauFR` : j->tau fake rate SF;
-4. `tauID` : tau ID SF.
+The scale factors are dumped as histograms to the RooT file:
+* `TauFW/Fitter/ETauFR/ScaleFactors(_fes)/{era}_{wpVsJet}_{wpVsMu}_{wpVsE}.root`.
+
+It contains four 2D histograms named
+1. `eTauFR_{wpVsJet}_{wpVsMu}_{wpVsE}` : e->tau fake rate SF;
+2. `FES_{wpVsJet}_{wpVsMu}_{wpVsE}` : e->tau fake energy scale;
+3. `jetTauFR_{wpVsJet}_{wpVsMu}_{wpVsE}` : j->tau fake rate SF;
+4. `tauID_{wpVsJet}_{wpVsMu}_{wpVsE}` : tau ID SF.
 
 Axis X of histograms corresponds to two eta bins:
 * bin 1 : 0 < eta < 1.48 (barrel)
@@ -201,7 +209,10 @@ for creation of JSON files.
 
 ## Validation of SFs
 
-Before running validation step, merge all RooT files with scale factors produced for a given era using bash script `TauFW/Fitter/ETauFR/scripts/MergeSFs.bash`. It is necessiated by interface to scale factors implemented in python file [`TauFW/Fitter/python/ETauFR/TauScaleFactors.py.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/python/ETauFR/TauScaleFactors.py)
+Before running validation step, merge all RooT files with scale factors produced for a given era using bash script `TauFW/Fitter/ETauFR/scripts/MergeSFs.bash`. It takes as a single argument era (2025, 2026 or 2526). The output file is created in the folder `TauFW/Fitter/ETauFR/ScaleFactors` and has the name:
+* `{era}_ScaleFactor.root`
+
+This step is necessiated by interface to scale factors implemented in python file [`TauFW/Fitter/python/ETauFR/TauScaleFactors.py.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/python/ETauFR/TauScaleFactors.py). Interface accesses file `{era}_ScaleFactor.root` and selects proper histograms by the name of working points of the DeepTau tagger.
 
 Standard e+tau selection with taus passing nominal ID can be run once again but this time with scale factors applied. 
 
