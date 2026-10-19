@@ -120,6 +120,15 @@ where
 * region : pass or fail
 * etabin : eta0p0to1p48 and eta1p48to2p5
 
+Also histograms with systematic templates are created for MC samples. They are obtained by varying energy scale of electron candidates from 0.96 to 1.04 with 0.02 step and energy scale of tau candidates from 0.86 to 1.14 with 0.02 step.
+Corresponding templates has trailing suffix in the names
+* EES{var} with {var} being variation of energy scale of electron candidates
+* TES{var} with {var} being variation of energy scale of tau candidate (genuine and e->tau fakes)
+
+These templates are then used to define shape systematics in datacards and implement morphing of ZL template with variation of the energy scale of the e->tau fake candidate.
+
+The corresponding dictionaries are defined in the file `TauFW/Fitter/python/utils.py` 
+
 ## Plotting control distributions
 
 Control plots are produced by script [`TauFW/Fitter/ETauFR/scripts/ControlPlotsETau.py`](https://github.com/raspereza/TauFW/blob/2024dev/Fitter/ETauFR/scripts/ControlPlotsETau.py). The following list of arguments should be provided
